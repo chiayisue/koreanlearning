@@ -3,139 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sue 的韓文單字特訓</title>
+    <title>Sue 的韓文口說特訓 App</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; }
-        h1 { color: #333; font-size: 24px; }
-        .meaning { font-size: 20px; font-weight: bold; color: #0056b3; margin: 20px 0; }
-        .hint { color: #888; font-size: 14px; margin-bottom: 20px; }
-        .korean-text { font-size: 32px; font-weight: bold; color: #333; margin-bottom: 30px; display: none; }
-        button { background-color: #28a745; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: 0.3s; margin: 5px; }
-        button:hover { background-color: #218838; }
-        #nextBtn { background-color: #007bff; display: none; }
-        #nextBtn:hover { background-color: #0056b3; }
-        #result { margin-top: 20px; font-size: 18px; font-weight: bold; }
-        .success { color: green; }
-        .error { color: red; }
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --bg-color: #f8f9fa;
+        }
+        body { 
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .card { 
+            background: white; 
+            padding: 40px 20px; 
+            border-radius: 24px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            width: 100%;
+            max-width: 450px; 
+        }
+        .category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #eef2f7;
+            color: #555;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        h1 { color: #333; font-size: 22px; margin-bottom: 30px; }
+        .meaning { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: var(--primary-color); 
+            margin: 20px 0;
+            line-height: 1.4;
+        }
+        .korean-answer { 
+            font-size: 32px; 
+            font-weight: bold; 
+            color: #333; 
+            margin: 25px 0;
+            min-height: 45px;
+            visibility: hidden; /* 預設隱藏，答對才顯示 */
+        }
+        .btn-container { margin-top: 30px; }
+        button { 
+            border: none; 
+            padding: 16px 32px; 
+            font-size: 18px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            width: 80%;
+            font-weight: 600;
+        }
+        #micBtn { background-color: var(--success-color); color: white; }
+        #micBtn:active { transform: scale(0.98); }
+        #nextBtn { background-color: var(--primary-color); color: white; display: none; }
+        
+        #result { 
+            margin-top: 25px; 
+            font-size: 16px; 
+            font-weight: 500;
+            min-height: 24px;
+        }
+        .success-text { color: var(--success-color); }
+        .error-text { color: var(--error-color); }
+        .hint { color: #999; font-size: 14px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>📝 單字口說挑戰</h1>
-    <div class="hint">請唸出符合以下情境的韓文單字：</div>
+    <div id="categoryLabel" class="category">加載中...</div>
+    <h1>🎤 韓文口說挑戰</h1>
     
-    <div class="meaning" id="questionMeaning">載入中...</div>
+    <div class="meaning" id="displayMeaning">準備開始...</div>
+    <div class="korean-answer" id="displayKorean"></div>
     
-    <div class="korean-text" id="answerText"></div>
-    
-    <div>
-        <button id="micBtn">🎤 按住開始回答</button>
-        <button id="nextBtn">下一題 ➡️</button>
+    <div class="btn-container">
+        <button id="micBtn">按住說話</button>
+        <button id="nextBtn">下一題 ➔</button>
     </div>
-    <p id="result">準備好了嗎？</p>
+    
+    <p id="result">點擊按鈕開始練習</p>
+    <div class="hint" id="progress">0 / 0</div>
 </div>
 
 <script>
-    // 建立題庫資料 (陣列)
+    // 根據 Sue #4 Whiteboard 筆記整合的題庫 
     const quizData = [
-        { 
-            korean: "퇴직", 
-            meaning: "official - retire (expired)" 
-        },
-        { 
-            korean: "퇴사", 
-            meaning: "personal - leave (tired/new job/career change)" 
-        },
-        { 
-            korean: "퇴근", 
-            meaning: "just for today (finished work and go home)" 
-        }
+        // 單字區 
+        { type: "詞彙", ko: "퇴직", en: "Retire (official/expired)" },
+        { type: "詞彙", ko: "퇴사", en: "Leave company (personal reason)" },
+        { type: "詞彙", ko: "퇴근", en: "Finish work for today" },
+        { type: "詞彙", ko: "옮기다", en: "To move (something/company)" },
+        { type: "詞彙", ko: "적다", en: "To write something down" },
+        
+        // 文法區 (必須/可以/不可以) 
+        { type: "文法", ko: "해야 돼요", en: "Have to / Should / Must" },
+        { type: "文法", ko: "해도 돼요", en: "It's okay to do / Can do" },
+        { type: "文法", ko: "하면 안 돼요", en: "Cannot / Must not" },
+        { type: "文法", ko: "하면 돼요", en: "You just need to do it" },
+        { type: "文法", ko: "해볼게요", en: "I'll try / Let me try" },
+
+        // 生活與職場句型 
+        { type: "句子", ko: "곧 퇴사해서 안 바빠요", en: "I'm quitting soon, so I'm not busy" },
+        { type: "句子", ko: "무슨 뜻이에요", en: "What does it mean?" },
+        { type: "句子", ko: "부모님이 퇴직할 때 대만으로 회사를 옮기니까 잘 됐어요", en: "My parents are retiring, and I'm moving my company to Taiwan, so it's great." },
+        { type: "句子", ko: "새로운 회사에 가면 시간이 많은데 뭐 하고 싶어요", en: "When you go to the new company and have time, what do you want to do?" }
     ];
 
-    let currentIndex = 0; // 記錄目前在哪一題
-
-    // 抓取畫面上的元素
-    const questionMeaning = document.getElementById('questionMeaning');
-    const answerText = document.getElementById('answerText');
-    const micBtn = document.getElementById('micBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const resultText = document.getElementById('result');
-
-    // 載入題目的函數
-    function loadQuestion() {
-        const currentQuiz = quizData[currentIndex];
-        questionMeaning.innerText = currentQuiz.meaning;
-        answerText.innerText = currentQuiz.korean;
-        answerText.style.display = "none"; // 隱藏答案
-        resultText.innerText = "等待錄音...";
-        resultText.className = "";
-        nextBtn.style.display = "none"; // 隱藏下一題按鈕
-        micBtn.style.display = "inline-block"; // 顯示麥克風按鈕
-    }
-
-    // 初始化第一題
-    loadQuestion();
-
-    // 語音辨識設定
+    let currentIndex = 0;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.lang = 'ko-KR'; 
+    recognition.lang = 'ko-KR';
     recognition.interimResults = false;
 
+    const catLabel = document.getElementById('categoryLabel');
+    const meaningEl = document.getElementById('displayMeaning');
+    const koreanEl = document.getElementById('displayKorean');
+    const micBtn = document.getElementById('micBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultEl = document.getElementById('result');
+    const progressEl = document.getElementById('progress');
+
+    function updateUI() {
+        const item = quizData[currentIndex];
+        catLabel.innerText = item.type;
+        meaningEl.innerText = item.en;
+        koreanEl.innerText = item.ko;
+        koreanEl.style.visibility = "hidden";
+        resultEl.innerText = "請按住按鈕並唸出韓文";
+        resultEl.className = "";
+        micBtn.style.display = "inline-block";
+        nextBtn.style.display = "none";
+        progressEl.innerText = `${currentIndex + 1} / ${quizData.length}`;
+    }
+
     micBtn.addEventListener('click', () => {
-        recognition.start();
-        micBtn.innerText = "🔴 聆聽中...";
-        resultText.innerText = "請說話...";
+        try {
+            recognition.start();
+            micBtn.innerText = "正在聆聽...";
+            micBtn.style.backgroundColor = "#ffc107";
+        } catch (e) {
+            console.log("辨識已在運行中");
+        }
     });
 
     recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.trim();
-        micBtn.innerText = "🎤 重新回答";
-        
-        const cleanTranscript = transcript.replace(/[\s.,?!]/g, "");
-        const cleanTarget = quizData[currentIndex].korean.replace(/[\s.,?!]/g, "");
+        const speechToText = event.results[0][0].transcript.trim();
+        const target = quizData[currentIndex].ko.replace(/[\s.,?!]/g, "");
+        const input = speechToText.replace(/[\s.,?!]/g, "");
 
-        if (cleanTranscript === cleanTarget) {
-            resultText.innerHTML = `✅ 正確！你說了：${transcript}`;
-            resultText.className = "success";
-            answerText.style.display = "block"; // 顯示正確韓文
-            micBtn.style.display = "none"; // 隱藏麥克風
-            nextBtn.style.display = "inline-block"; // 顯示下一題按鈕
+        micBtn.innerText = "按住說話";
+        micBtn.style.backgroundColor = "#28a745";
+
+        if (input === target) {
+            resultEl.innerText = `✅ 正確！你說了: ${speechToText}`;
+            resultEl.className = "success-text";
+            koreanEl.style.visibility = "visible";
+            micBtn.style.display = "none";
+            nextBtn.style.display = "inline-block";
         } else {
-            resultText.innerHTML = `❌ 不太對喔！系統聽到的是：${transcript}`;
-            resultText.className = "error";
+            resultEl.innerText = `❌ 聽起來像是: ${speechToText}`;
+            resultEl.className = "error-text";
         }
     };
 
-    recognition.onerror = (event) => {
-        micBtn.innerText = "🎤 按住開始回答";
-        resultText.innerText = "沒聽到聲音，請重試。";
+    recognition.onerror = () => {
+        micBtn.innerText = "按住說話";
+        micBtn.style.backgroundColor = "#28a745";
+        resultEl.innerText = "沒聽清楚，請再試一次";
     };
 
-    // 下一題按鈕邏輯
     nextBtn.addEventListener('click', () => {
         currentIndex++;
-        // 檢查是否還有題目
         if (currentIndex < quizData.length) {
-            loadQuestion();
-            micBtn.innerText = "🎤 按住開始回答";
+            updateUI();
         } else {
-            // 測驗結束
-            questionMeaning.innerText = "🎉 恭喜你完成所有單字測驗！";
-            answerText.style.display = "none";
+            catLabel.innerText = "完成";
+            meaningEl.innerText = "🎉 今天的練習結束囉！";
+            koreanEl.style.visibility = "hidden";
             nextBtn.style.display = "none";
-            resultText.innerText = "";
-            
-            // 加入一個重新開始的按鈕功能
-            setTimeout(() => {
-                currentIndex = 0;
-                loadQuestion();
-                micBtn.innerText = "🎤 按住開始回答";
-            }, 3000); // 3秒後重新開始
+            micBtn.innerText = "重新開始";
+            micBtn.style.display = "inline-block";
+            currentIndex = -1; // 點擊後重新開始
         }
     });
+
+    // 初始化
+    updateUI();
 </script>
 
 </body>
