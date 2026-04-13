@@ -9,6 +9,7 @@
             --primary: #4a90e2;
             --success: #28a745;
             --error: #eb4d4b;
+            --warning: #f39c12;
             --bg: #f5f7fa;
             --card: #ffffff;
             --text: #2d3436;
@@ -36,15 +37,20 @@
         .menu-item:active { transform: scale(0.97); }
         .menu-item h3 { margin: 0; font-size: 18px; }
         .menu-item .icon { font-size: 24px; }
+        
+        /* Mistake Review Button */
+        #mistakeBtn { background: #fff5f5; border: 1px solid #ffcccc; display: none; }
+        #mistakeBtn h3 { color: var(--error); }
+        .mistake-badge { background: var(--error); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px; margin-left: 10px; }
 
         /* Quiz View Styles */
         #quizView { display: none; padding-top: 20px; text-align: center; }
         .progress-bar { width: 100%; height: 6px; background: #dfe6e9; border-radius: 3px; margin-bottom: 40px; }
         #progressFill { width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: 0.3s; }
         
-        .question-card { min-height: 200px; display: flex; flex-direction: column; justify-content: center; }
-        .meaning-text { font-size: 24px; font-weight: 700; color: #636e72; margin-bottom: 10px; }
-        .correct-answer { font-size: 36px; font-weight: 800; color: var(--primary); margin-top: 10px; visibility: hidden; }
+        .question-card { min-height: 200px; display: flex; flex-direction: column; justify-content: center; padding: 0 10px; }
+        .meaning-text { font-size: 22px; font-weight: 700; color: #2d3436; margin-bottom: 15px; line-height: 1.4; }
+        .correct-answer { font-size: 32px; font-weight: 800; color: var(--primary); margin-top: 10px; visibility: hidden; line-height: 1.3; word-break: keep-all; }
         
         .feedback-area { min-height: 60px; margin: 20px 0; font-weight: 600; font-size: 16px; }
         
@@ -67,7 +73,7 @@
             background: var(--text); color: white; border: none; padding: 15px 40px;
             border-radius: 30px; font-size: 18px; font-weight: 600; display: none; margin: 0 auto;
         }
-        .play-btn { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 15px; margin-top: 10px; cursor: pointer; display: none; font-size: 14px; font-weight: 600; }
+        .play-btn { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 15px; margin-top: 15px; cursor: pointer; display: none; font-size: 14px; font-weight: 600; }
         .back-home { margin-top: 30px; background: none; border: none; color: #b2bec3; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
@@ -87,10 +93,13 @@
                 <h3>⚙️ 語法辨析</h3><span class="icon">➔</span>
             </div>
             <div class="menu-item" onclick="startQuiz('句型')">
-                <h3>💬 生活句型</h3><span class="icon">➔</span>
+                <h3>💬 實用長句</h3><span class="icon">➔</span>
             </div>
             <div class="menu-item" onclick="startQuiz('全部')">
                 <h3>🎲 全部挑戰</h3><span class="icon">➔</span>
+            </div>
+            <div class="menu-item" id="mistakeBtn" onclick="startMistakeQuiz()">
+                <h3>🔥 易錯弱點複習 <span id="mistakeCount" class="mistake-badge">0</span></h3><span class="icon">➔</span>
             </div>
         </div>
     </div>
@@ -101,7 +110,7 @@
             <div id="catTag" style="font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: 600;"></div>
             <div class="meaning-text" id="targetMeaning">準備好...</div>
             <div class="correct-answer" id="targetKorean"></div>
-            <button id="repeatBtn" class="play-btn" onclick="playAudio()">🔊 重聽讀音</button>
+            <button id="repeatBtn" class="play-btn" onclick="playAudio()">🔊 聆聽標準發音</button>
         </div>
 
         <div class="feedback-area" id="feedback"></div>
@@ -118,25 +127,35 @@
 </div>
 
 <script>
+    // 根據白板筆記重新梳理：精確的中文語意與文法結構
     const allData = [
-        { cat: "詞彙", ko: "퇴직", en: "Official - Retire (expired)" },
-        { cat: "詞彙", ko: "퇴사", en: "Personal - Leave job (career change)" },
-        { cat: "詞彙", ko: "퇴근", en: "Finish work for today" },
-        { cat: "詞彙", ko: "옮기다", en: "To move (something/company)" },
-        { cat: "詞彙", ko: "적다", en: "To write something down" },
-        { cat: "詞彙", ko: "맛있는 음식", en: "Delicious food" },
-        { cat: "詞彙", ko: "먹기", en: "Eating (Noun form)" },
-        { cat: "文法", ko: "해야 돼요", en: "Must / Have to" },
-        { cat: "文法", ko: "해도 돼요", en: "Can / It's okay to" },
-        { cat: "文法", ko: "하면 안 돼요", en: "Must not / Cannot" },
-        { cat: "文法", ko: "해볼게요", en: "Let me try" },
-        { cat: "句型", ko: "곧 퇴사해서 안 바빠요", en: "Quitting soon, so not busy" },
-        { cat: "句型", ko: "부모님이 퇴직할 때 대만으로 회사를 옮기니까 잘 됐어요", en: "Moving to Taiwan as parents retire" },
-        { cat: "句型", ko: "새로운 회사에 가면 시간이 많은데 뭐 하고 싶어요", en: "What to do with more time at new job?" }
+        // 核心字彙
+        { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
+        { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更/換工作)" },
+        { cat: "詞彙", ko: "퇴근", en: "下班 (今日工作結束)" },
+        { cat: "詞彙", ko: "옮기다", en: "搬移 / 換 (例如：換公司)" },
+        { cat: "詞彙", ko: "적다", en: "寫下 / 記錄" },
+        { cat: "詞彙", ko: "맛있는 음식", en: "好吃的食物 (形容詞 + 名詞)" },
+        { cat: "詞彙", ko: "먹기", en: "吃 (動詞轉名詞型態)" },
+        
+        // 語法辨析 (許可、義務、禁止)
+        { cat: "文法", ko: "해야 돼요", en: "必須做 / 應該做 (Have to / Must)" },
+        { cat: "文法", ko: "해도 돼요", en: "可以做 / 做...也沒關係 (It's okay to)" },
+        { cat: "文法", ko: "하면 안 돼요", en: "絕對不可以做 (Must not)" },
+        { cat: "文法", ko: "하면 돼요", en: "只要做...就可以了 (You just need to)" },
+        { cat: "文法", ko: "해볼게요", en: "我來試試看 (I'll try)" },
+
+        // 實用長句 (精確還原文法語境)
+        { cat: "句型", ko: "곧 퇴사해서 안 바빠요", en: "「因為」很快就要離職了，所以不忙。" },
+        { cat: "句型", ko: "새로운 회사에 가면 시간이 많은데 뭐 하고 싶어요", en: "去新公司的話時間會變多，「想做些什麼呢？」" },
+        { cat: "句型", ko: "부모님이 퇴직할 때 대만으로 회사를 옮기니까 잘 됐어요", en: "父母退休「的時候」，(我)「因為」換公司搬回台灣，真是太好了/時機正好。" },
+        { cat: "句型", ko: "무슨 뜻이에요", en: "這是什麼意思？" }
     ];
 
     let currentSet = [];
     let idx = 0;
+    let mistakeBank = []; // 錯題本陣列
+
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ko-KR';
     recognition.continuous = false;
@@ -144,20 +163,46 @@
     function playAudio(text) {
         const target = text || allData.find(q => q.ko === document.getElementById('targetKorean').innerText)?.ko;
         if (!target) return;
-        window.speechSynthesis.cancel(); // 停止目前的播放
+        window.speechSynthesis.cancel(); 
         const utter = new SpeechSynthesisUtterance(target);
         utter.lang = 'ko-KR';
         utter.rate = 0.85;
         window.speechSynthesis.speak(utter);
     }
 
+    // 更新首頁錯題本按鈕狀態
+    function updateMistakeButton() {
+        const btn = document.getElementById('mistakeBtn');
+        const countSpan = document.getElementById('mistakeCount');
+        if (mistakeBank.length > 0) {
+            btn.style.display = 'flex';
+            countSpan.innerText = mistakeBank.length;
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+
     function startQuiz(type) {
         currentSet = (type === '全部') ? [...allData] : allData.filter(q => q.cat === type);
+        currentSet.sort(() => Math.random() - 0.5); // 打亂順序
+        idx = 0;
+        document.getElementById('homeView').style.display = 'none';
+        document.getElementById('quizView').style.display = 'block';
+        showCurrent();
+    }
+
+    // 啟動錯題本專屬測驗
+    function startMistakeQuiz() {
+        if (mistakeBank.length === 0) return;
+        currentSet = [...mistakeBank];
         currentSet.sort(() => Math.random() - 0.5);
         idx = 0;
         document.getElementById('homeView').style.display = 'none';
         document.getElementById('quizView').style.display = 'block';
         showCurrent();
+        // 進入錯題測驗後，清空錯題本，答對就永遠移除，答錯會再次被加入
+        mistakeBank = []; 
+        updateMistakeButton();
     }
 
     function showCurrent() {
@@ -168,37 +213,51 @@
         document.getElementById('targetKorean').style.visibility = 'hidden';
         document.getElementById('feedback').innerText = "";
         document.getElementById('feedback').style.color = 'inherit';
-        document.getElementById('progressFill').style.width = `${((idx + 1) / currentSet.length) * 100}%`;
+        document.getElementById('progressFill').style.width = `${((idx) / currentSet.length) * 100}%`;
         document.getElementById('micBtn').style.display = 'inline-block';
         document.getElementById('nextBtn').style.display = 'none';
         document.getElementById('repeatBtn').style.display = 'none';
     }
 
     document.getElementById('micBtn').addEventListener('click', () => {
-        recognition.start();
-        document.getElementById('micBtn').classList.add('recording');
-        document.getElementById('feedback').innerText = "正在聆聽你的發音...";
+        try {
+            recognition.start();
+            document.getElementById('micBtn').classList.add('recording');
+            document.getElementById('feedback').innerText = "正在聆聽你的發音...";
+        } catch (e) {
+            console.log("語音辨識運行中");
+        }
     });
 
     recognition.onresult = (event) => {
         const result = event.results[0][0].transcript.trim();
-        const target = currentSet[idx].ko.replace(/[\s.,?!]/g, "");
+        const currentQ = currentSet[idx];
+        const target = currentQ.ko.replace(/[\s.,?!]/g, "");
         const input = result.replace(/[\s.,?!]/g, "");
         
         document.getElementById('micBtn').classList.remove('recording');
 
         if (input === target) {
-            document.getElementById('feedback').innerText = `✅ 完美！你說了 "${result}"`;
+            document.getElementById('feedback').innerText = `✅ 完美！`;
             document.getElementById('feedback').style.color = 'var(--success)';
             document.getElementById('targetKorean').style.visibility = 'visible';
             document.getElementById('micBtn').style.display = 'none';
             document.getElementById('nextBtn').style.display = 'block';
-        } else {
-            document.getElementById('feedback').innerText = `❌ 聽起來像是 "${result}"，再試一次或聽讀音`;
-            document.getElementById('feedback').style.color = 'var(--error)';
-            document.getElementById('targetKorean').style.visibility = 'visible'; // 答錯也顯示正確答案
             document.getElementById('repeatBtn').style.display = 'inline-block';
-            playAudio(currentSet[idx].ko); // 自動播放讀音
+            document.getElementById('progressFill').style.width = `${((idx + 1) / currentSet.length) * 100}%`;
+        } else {
+            document.getElementById('feedback').innerText = `❌ 聽起來像 "${result}"，請看解答並重試`;
+            document.getElementById('feedback').style.color = 'var(--error)';
+            document.getElementById('targetKorean').style.visibility = 'visible'; 
+            document.getElementById('repeatBtn').style.display = 'inline-block';
+            playAudio(currentQ.ko);
+            
+            // 【錯題收錄邏輯】：如果這題不在錯題本裡，就把它加進去
+            const isAlreadyInMistakeBank = mistakeBank.some(item => item.ko === currentQ.ko);
+            if (!isAlreadyInMistakeBank) {
+                mistakeBank.push(currentQ);
+                updateMistakeButton();
+            }
         }
     };
 
@@ -209,13 +268,18 @@
 
     function nextQuestion() {
         idx++;
-        if (idx < currentSet.length) showCurrent();
-        else { alert("太棒了！練習完成！"); goHome(); }
+        if (idx < currentSet.length) {
+            showCurrent();
+        } else { 
+            alert("太棒了！本階段練習完成！"); 
+            goHome(); 
+        }
     }
 
     function goHome() {
         document.getElementById('homeView').style.display = 'block';
         document.getElementById('quizView').style.display = 'none';
+        updateMistakeButton(); // 回首頁時更新錯題數量顯示
     }
 </script>
 </body>
