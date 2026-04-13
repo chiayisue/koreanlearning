@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Sue's Korean Hub</title>
     <style>
         :root {
@@ -15,15 +17,25 @@
             --text: #2d3436;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body { 
             font-family: 'Pretendard', -apple-system, sans-serif; 
             background-color: var(--bg); color: var(--text);
-            margin: 0; padding: 0; display: flex; justify-content: center;
+            margin: 0; padding: 0; 
+            display: flex; justify-content: center;
+            height: 100dvh; overflow: hidden;
         }
-        .app-container { width: 100%; max-width: 500px; min-height: 100vh; position: relative; padding: 20px; }
         
-        /* Home View Styles */
-        #homeView { padding-top: 40px; }
+        .app-container { 
+            width: 100%; max-width: 500px; 
+            height: 100%; 
+            display: flex; flex-direction: column; 
+            padding: 20px; 
+        }
+        
+        #homeView { 
+            flex: 1; overflow-y: auto; padding-top: 20px; padding-bottom: 20px;
+        }
         .header { text-align: left; margin-bottom: 30px; }
         .header h1 { font-size: 28px; margin: 0; color: var(--primary); }
         .header p { color: #636e72; margin: 5px 0 0; }
@@ -38,29 +50,35 @@
         .menu-item h3 { margin: 0; font-size: 18px; }
         .menu-item .icon { font-size: 24px; }
         
-        /* Mistake Review Button */
         #mistakeBtn { background: #fff5f5; border: 1px solid #ffcccc; display: none; }
         #mistakeBtn h3 { color: var(--error); }
         .mistake-badge { background: var(--error); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px; margin-left: 10px; }
 
-        /* Quiz View Styles */
-        #quizView { display: none; padding-top: 20px; text-align: center; }
-        .progress-bar { width: 100%; height: 6px; background: #dfe6e9; border-radius: 3px; margin-bottom: 40px; }
+        #quizView { 
+            display: none; 
+            flex-direction: column; 
+            height: 100%; text-align: center; 
+        }
+        .progress-bar { width: 100%; height: 6px; background: #dfe6e9; border-radius: 3px; margin-bottom: 20px; flex-shrink: 0; }
         #progressFill { width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: 0.3s; }
         
-        .question-card { min-height: 200px; display: flex; flex-direction: column; justify-content: center; padding: 0 10px; }
+        .question-card { 
+            flex: 1; display: flex; flex-direction: column; justify-content: center; 
+            padding: 0 10px; min-height: 0;
+        }
         .meaning-text { font-size: 22px; font-weight: 700; color: #2d3436; margin-bottom: 15px; line-height: 1.4; }
         .correct-answer { font-size: 32px; font-weight: 800; color: var(--primary); margin-top: 10px; visibility: hidden; line-height: 1.3; word-break: keep-all; }
         
-        .feedback-area { min-height: 60px; margin: 20px 0; font-weight: 600; font-size: 16px; }
+        .feedback-area { min-height: 50px; margin: 10px 0; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         
-        /* Professional Large Mic Button */
-        .controls { position: absolute; bottom: 50px; left: 0; right: 0; text-align: center; }
-        .mic-btn-container { position: relative; display: inline-block; }
+        .controls { 
+            padding-bottom: 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;
+        }
+        .mic-btn-container { position: relative; display: flex; justify-content: center; height: 90px; margin-bottom: 10px; }
         #micBtn {
-            width: 90px; height: 90px; border-radius: 50%; background: var(--primary);
-            border: none; color: white; font-size: 32px; cursor: pointer;
-            box-shadow: 0 10px 25px rgba(74, 144, 226, 0.4); z-index: 2; position: relative;
+            width: 80px; height: 80px; border-radius: 50%; background: var(--primary);
+            border: none; color: white; font-size: 28px; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4); transition: background-color 0.3s;
         }
         #micBtn.recording { background: var(--error); animation: pulse 1.5s infinite; }
         @keyframes pulse { 
@@ -71,10 +89,10 @@
 
         #nextBtn {
             background: var(--text); color: white; border: none; padding: 15px 40px;
-            border-radius: 30px; font-size: 18px; font-weight: 600; display: none; margin: 0 auto;
+            border-radius: 30px; font-size: 18px; font-weight: 600; display: none; width: 80%; max-width: 250px;
         }
-        .play-btn { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 15px; margin-top: 15px; cursor: pointer; display: none; font-size: 14px; font-weight: 600; }
-        .back-home { margin-top: 30px; background: none; border: none; color: #b2bec3; cursor: pointer; text-decoration: underline; }
+        .play-btn { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 15px; margin-top: 15px; cursor: pointer; display: none; font-size: 14px; font-weight: 600; margin-left: auto; margin-right: auto; }
+        .back-home { margin-top: 20px; background: none; border: none; color: #b2bec3; cursor: pointer; text-decoration: underline; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -106,6 +124,7 @@
 
     <div id="quizView">
         <div class="progress-bar"><div id="progressFill"></div></div>
+        
         <div class="question-card">
             <div id="catTag" style="font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: 600;"></div>
             <div class="meaning-text" id="targetMeaning">準備好...</div>
@@ -120,41 +139,50 @@
                 <button id="micBtn">🎤</button>
             </div>
             <button id="nextBtn" onclick="nextQuestion()">下一題 ➔</button>
-            <br>
             <button class="back-home" onclick="goHome()">回首頁</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 根據白板筆記重新梳理：精確的中文語意與文法結構
+    // 整合所有舊有與最新 (0408/0409) 的題庫內容
     const allData = [
-        // 核心字彙
+        // --- 第一週內容保留 ---
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
         { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更/換工作)" },
         { cat: "詞彙", ko: "퇴근", en: "下班 (今日工作結束)" },
         { cat: "詞彙", ko: "옮기다", en: "搬移 / 換 (例如：換公司)" },
         { cat: "詞彙", ko: "적다", en: "寫下 / 記錄" },
-        { cat: "詞彙", ko: "맛있는 음식", en: "好吃的食物 (形容詞 + 名詞)" },
-        { cat: "詞彙", ko: "먹기", en: "吃 (動詞轉名詞型態)" },
-        
-        // 語法辨析 (許可、義務、禁止)
-        { cat: "文法", ko: "해야 돼요", en: "必須做 / 應該做 (Have to / Must)" },
-        { cat: "文法", ko: "해도 돼요", en: "可以做 / 做...也沒關係 (It's okay to)" },
-        { cat: "文法", ko: "하면 안 돼요", en: "絕對不可以做 (Must not)" },
-        { cat: "文法", ko: "하면 돼요", en: "只要做...就可以了 (You just need to)" },
-        { cat: "文法", ko: "해볼게요", en: "我來試試看 (I'll try)" },
-
-        // 實用長句 (精確還原文法語境)
+        { cat: "文法", ko: "해야 돼요", en: "必須做 / 應該做" },
+        { cat: "文法", ko: "해도 돼요", en: "可以做 / 做...也沒關係" },
+        { cat: "文法", ko: "하면 안 돼요", en: "絕對不可以做" },
         { cat: "句型", ko: "곧 퇴사해서 안 바빠요", en: "「因為」很快就要離職了，所以不忙。" },
         { cat: "句型", ko: "새로운 회사에 가면 시간이 많은데 뭐 하고 싶어요", en: "去新公司的話時間會變多，「想做些什麼呢？」" },
-        { cat: "句型", ko: "부모님이 퇴직할 때 대만으로 회사를 옮기니까 잘 됐어요", en: "父母退休「的時候」，(我)「因為」換公司搬回台灣，真是太好了/時機正好。" },
-        { cat: "句型", ko: "무슨 뜻이에요", en: "這是什麼意思？" }
+        { cat: "句型", ko: "부모님이 퇴직할 때 대만으로 회사를 옮기니까 잘 됐어요", en: "父母退休「的時候」，(我)「因為」換公司搬回台灣，真是太好了。" },
+        
+        // --- 本週新增 (0408/0409) ---
+        { cat: "詞彙", ko: "최애", en: "最愛 / 偶像" },
+        { cat: "詞彙", ko: "알려 주다", en: "告訴 / 讓...知道" },
+        { cat: "詞彙", ko: "짐 싸기", en: "打包行李 (動名詞)" },
+        { cat: "詞彙", ko: "머무다", en: "暫時居住 / 停留" },
+        { cat: "詞彙", ko: "기대돼요", en: "很期待 (Look forward to)" },
+
+        // 文法：動詞轉名詞與分詞修飾
+        { cat: "文法", ko: "먹는 음식", en: "「正在吃」的食物 (動詞現在分詞)" },
+        { cat: "文法", ko: "먹을 음식", en: "「要吃」的食物 (動詞未來分詞)" },
+        { cat: "文法", ko: "읽는 책이에요", en: "是「正在讀」的書" },
+        { cat: "文法", ko: "줄 선물이에요", en: "是「要送給」別人的禮物" },
+
+        // 實用長句
+        { cat: "句型", ko: "제가 필요 없는 것을 다 팔았어요", en: "我把不需要的東西都賣掉了" },
+        { cat: "句型", ko: "다음 달에 뉴욕에 갈 거예요", en: "下個月我要去紐約" },
+        { cat: "句型", ko: "맛있는 식당을 찾고 있어요", en: "我正在找好吃的餐廳" },
+        { cat: "句型", ko: "짐 싸기를 다 끝냈어요", en: "行李打包都完成了" }
     ];
 
     let currentSet = [];
     let idx = 0;
-    let mistakeBank = []; // 錯題本陣列
+    let mistakeBank = [];
 
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ko-KR';
@@ -170,7 +198,6 @@
         window.speechSynthesis.speak(utter);
     }
 
-    // 更新首頁錯題本按鈕狀態
     function updateMistakeButton() {
         const btn = document.getElementById('mistakeBtn');
         const countSpan = document.getElementById('mistakeCount');
@@ -184,23 +211,21 @@
 
     function startQuiz(type) {
         currentSet = (type === '全部') ? [...allData] : allData.filter(q => q.cat === type);
-        currentSet.sort(() => Math.random() - 0.5); // 打亂順序
+        currentSet.sort(() => Math.random() - 0.5);
         idx = 0;
         document.getElementById('homeView').style.display = 'none';
-        document.getElementById('quizView').style.display = 'block';
+        document.getElementById('quizView').style.display = 'flex';
         showCurrent();
     }
 
-    // 啟動錯題本專屬測驗
     function startMistakeQuiz() {
         if (mistakeBank.length === 0) return;
         currentSet = [...mistakeBank];
         currentSet.sort(() => Math.random() - 0.5);
         idx = 0;
         document.getElementById('homeView').style.display = 'none';
-        document.getElementById('quizView').style.display = 'block';
+        document.getElementById('quizView').style.display = 'flex';
         showCurrent();
-        // 進入錯題測驗後，清空錯題本，答對就永遠移除，答錯會再次被加入
         mistakeBank = []; 
         updateMistakeButton();
     }
@@ -214,6 +239,8 @@
         document.getElementById('feedback').innerText = "";
         document.getElementById('feedback').style.color = 'inherit';
         document.getElementById('progressFill').style.width = `${((idx) / currentSet.length) * 100}%`;
+        
+        document.querySelector('.mic-btn-container').style.display = 'flex';
         document.getElementById('micBtn').style.display = 'inline-block';
         document.getElementById('nextBtn').style.display = 'none';
         document.getElementById('repeatBtn').style.display = 'none';
@@ -241,18 +268,18 @@
             document.getElementById('feedback').innerText = `✅ 完美！`;
             document.getElementById('feedback').style.color = 'var(--success)';
             document.getElementById('targetKorean').style.visibility = 'visible';
-            document.getElementById('micBtn').style.display = 'none';
-            document.getElementById('nextBtn').style.display = 'block';
-            document.getElementById('repeatBtn').style.display = 'inline-block';
+            
+            document.querySelector('.mic-btn-container').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('repeatBtn').style.display = 'block';
             document.getElementById('progressFill').style.width = `${((idx + 1) / currentSet.length) * 100}%`;
         } else {
             document.getElementById('feedback').innerText = `❌ 聽起來像 "${result}"，請看解答並重試`;
             document.getElementById('feedback').style.color = 'var(--error)';
             document.getElementById('targetKorean').style.visibility = 'visible'; 
-            document.getElementById('repeatBtn').style.display = 'inline-block';
+            document.getElementById('repeatBtn').style.display = 'block';
             playAudio(currentQ.ko);
             
-            // 【錯題收錄邏輯】：如果這題不在錯題本裡，就把它加進去
             const isAlreadyInMistakeBank = mistakeBank.some(item => item.ko === currentQ.ko);
             if (!isAlreadyInMistakeBank) {
                 mistakeBank.push(currentQ);
@@ -279,7 +306,7 @@
     function goHome() {
         document.getElementById('homeView').style.display = 'block';
         document.getElementById('quizView').style.display = 'none';
-        updateMistakeButton(); // 回首頁時更新錯題數量顯示
+        updateMistakeButton();
     }
 </script>
 </body>
