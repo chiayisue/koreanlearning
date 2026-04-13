@@ -3,206 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sue 的韓文口說特訓 App</title>
+    <title>Sue 的韓文學習中心</title>
     <style>
         :root {
-            --primary-color: #4a90e2;
-            --success-color: #28a745;
-            --error-color: #dc3545;
-            --bg-color: #f8f9fa;
+            --primary: #4a90e2;
+            --success: #28a745;
+            --error: #dc3545;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
         }
         body { 
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            text-align: center; 
-            padding: 20px; 
-            background-color: var(--bg-color);
+            font-family: 'Pretendard', sans-serif; 
+            background-color: var(--bg);
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
         }
-        .card { 
-            background: white; 
-            padding: 40px 20px; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        .container {
             width: 100%;
-            max-width: 450px; 
+            max-width: 480px;
+            padding: 20px;
         }
-        .category {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #eef2f7;
-            color: #555;
-            border-radius: 20px;
-            font-size: 13px;
-            margin-bottom: 15px;
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px 25px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            text-align: center;
         }
-        h1 { color: #333; font-size: 22px; margin-bottom: 30px; }
-        .meaning { 
-            font-size: 24px; 
-            font-weight: 700; 
-            color: var(--primary-color); 
-            margin: 20px 0;
-            line-height: 1.4;
+        /* 首頁樣式 */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
         }
-        .korean-answer { 
-            font-size: 32px; 
-            font-weight: bold; 
-            color: #333; 
-            margin: 25px 0;
-            min-height: 45px;
-            visibility: hidden; /* 預設隱藏，答對才顯示 */
-        }
-        .btn-container { margin-top: 30px; }
-        button { 
-            border: none; 
-            padding: 16px 32px; 
-            font-size: 18px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            width: 80%;
+        .menu-btn {
+            background: white;
+            border: 2px solid #eee;
+            padding: 20px 10px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.2s;
             font-weight: 600;
+            font-size: 16px;
         }
-        #micBtn { background-color: var(--success-color); color: white; }
-        #micBtn:active { transform: scale(0.98); }
-        #nextBtn { background-color: var(--primary-color); color: white; display: none; }
+        .menu-btn:hover { border-color: var(--primary); color: var(--primary); }
         
-        #result { 
-            margin-top: 25px; 
-            font-size: 16px; 
-            font-weight: 500;
-            min-height: 24px;
+        /* 練習區樣式 */
+        .quiz-view { display: none; }
+        .category-tag {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
         }
-        .success-text { color: var(--success-color); }
-        .error-text { color: var(--error-color); }
-        .hint { color: #999; font-size: 14px; margin-top: 10px; }
+        .meaning { font-size: 26px; font-weight: 700; color: #333; margin: 25px 0; min-height: 70px; }
+        .korean-text { font-size: 34px; font-weight: 800; color: var(--primary); margin-bottom: 30px; visibility: hidden; }
+        
+        .action-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        #micBtn { background: var(--success); color: white; }
+        #nextBtn { background: var(--primary); color: white; display: none; }
+        .back-btn { background: none; color: #888; border: none; font-size: 14px; cursor: pointer; margin-top: 20px; }
+        
+        #result { font-size: 16px; margin: 20px 0; min-height: 24px; }
+        .success-text { color: var(--success); font-weight: bold; }
+        .error-text { color: var(--error); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div id="categoryLabel" class="category">加載中...</div>
-    <h1>🎤 韓文口說挑戰</h1>
-    
-    <div class="meaning" id="displayMeaning">準備開始...</div>
-    <div class="korean-answer" id="displayKorean"></div>
-    
-    <div class="btn-container">
-        <button id="micBtn">按住說話</button>
-        <button id="nextBtn">下一題 ➔</button>
+<div class="container">
+    <div id="homeView" class="card">
+        <h1 style="margin-bottom: 10px;">👋 韓文學習中心</h1>
+        <p style="color: #666;">選擇你想練習的單元</p>
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="startQuiz('詞彙')">📚 核心詞彙</button>
+            <button class="menu-btn" onclick="startQuiz('文法')">⚙️ 語法辨析</button>
+            <button class="menu-btn" onclick="startQuiz('句型')">💬 生活句型</button>
+            <button class="menu-btn" onclick="startQuiz('全部')">🎲 全部隨機</button>
+        </div>
     </div>
-    
-    <p id="result">點擊按鈕開始練習</p>
-    <div class="hint" id="progress">0 / 0</div>
+
+    <div id="quizView" class="card quiz-view">
+        <div id="categoryLabel" class="category-tag">分類</div>
+        <div class="meaning" id="displayMeaning">載入中...</div>
+        <div class="korean-text" id="displayKorean">答案</div>
+        
+        <div id="result">等待錄音...</div>
+        
+        <button id="micBtn">🎤 按住開始回答</button>
+        <button id="nextBtn">下一題 ➔</button>
+        <br>
+        <button class="back-btn" onclick="goHome()">🏠 返回首頁</button>
+    </div>
 </div>
 
 <script>
-    // 根據 Sue #4 Whiteboard 筆記整合的題庫 
-    const quizData = [
-        // 單字區 
-        { type: "詞彙", ko: "퇴직", en: "Retire (official/expired)" },
-        { type: "詞彙", ko: "퇴사", en: "Leave company (personal reason)" },
-        { type: "詞彙", ko: "퇴근", en: "Finish work for today" },
-        { type: "詞彙", ko: "옮기다", en: "To move (something/company)" },
-        { type: "詞彙", ko: "적다", en: "To write something down" },
+    // 整合自筆記 Sue #4 Whiteboard 的完整題庫 
+    const allQuestions = [
+        { cat: "詞彙", ko: "퇴직", en: "Retire (Official/Expired)" },
+        { cat: "詞彙", ko: "퇴사", en: "Leave company (Personal/Career)" },
+        { cat: "詞彙", ko: "퇴근", en: "Off work (Finished today)" },
+        { cat: "詞彙", ko: "옮기다", en: "To move (something/company)" },
+        { cat: "詞彙", ko: "적다", en: "Writing something" },
+        { cat: "詞彙", ko: "맛있는 음식", en: "Delicious food (Adj form)" },
+        { cat: "詞彙", ko: "재미있는 공연", en: "Interesting performance" },
+        { cat: "詞彙", ko: "먹기", en: "Eating (Noun form)" },
+        { cat: "詞彙", ko: "살기", en: "Living (Noun form)" },
         
-        // 文法區 (必須/可以/不可以) 
-        { type: "文法", ko: "해야 돼요", en: "Have to / Should / Must" },
-        { type: "文法", ko: "해도 돼요", en: "It's okay to do / Can do" },
-        { type: "文法", ko: "하면 안 돼요", en: "Cannot / Must not" },
-        { type: "文法", ko: "하면 돼요", en: "You just need to do it" },
-        { type: "文法", ko: "해볼게요", en: "I'll try / Let me try" },
+        { cat: "文法", ko: "해야 돼요", en: "Must / Have to" },
+        { cat: "文法", ko: "해도 돼요", en: "Can / It's okay to" },
+        { cat: "文法", ko: "하면 안 돼요", en: "Must not / Cannot" },
+        { cat: "文法", ko: "하면 돼요", en: "You just need to do it" },
+        { cat: "文法", ko: "해볼게요", en: "Let me try / I'll try" },
 
-        // 生活與職場句型 
-        { type: "句子", ko: "곧 퇴사해서 안 바빠요", en: "I'm quitting soon, so I'm not busy" },
-        { type: "句子", ko: "무슨 뜻이에요", en: "What does it mean?" },
-        { type: "句子", ko: "부모님이 퇴직할 때 대만으로 회사를 옮기니까 잘 됐어요", en: "My parents are retiring, and I'm moving my company to Taiwan, so it's great." },
-        { type: "句子", ko: "새로운 회사에 가면 시간이 많은데 뭐 하고 싶어요", en: "When you go to the new company and have time, what do you want to do?" }
+        { cat: "句型", ko: "곧 퇴사해서 안 바빠요", en: "Soon quitting, so not busy" },
+        { cat: "句型", ko: "무슨 뜻이에요", en: "What does it mean?" },
+        { cat: "句型", ko: "부모님이 퇴직할 때 대만으로 회사를 옮기니까 잘 됐어요", en: "Parents retiring & moving to Taiwan, so it's good" },
+        { cat: "句型", ko: "새로운 회사에 가면 시간이 많은데 뭐 하고 싶어요", en: "If time permits in new job, what to do?" }
     ];
 
+    let currentQuizSet = [];
     let currentIndex = 0;
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ko-KR';
-    recognition.interimResults = false;
 
-    const catLabel = document.getElementById('categoryLabel');
-    const meaningEl = document.getElementById('displayMeaning');
-    const koreanEl = document.getElementById('displayKorean');
-    const micBtn = document.getElementById('micBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const resultEl = document.getElementById('result');
-    const progressEl = document.getElementById('progress');
+    const synth = window.speechSynthesis;
 
-    function updateUI() {
-        const item = quizData[currentIndex];
-        catLabel.innerText = item.type;
-        meaningEl.innerText = item.en;
-        koreanEl.innerText = item.ko;
-        koreanEl.style.visibility = "hidden";
-        resultEl.innerText = "請按住按鈕並唸出韓文";
-        resultEl.className = "";
-        micBtn.style.display = "inline-block";
-        nextBtn.style.display = "none";
-        progressEl.innerText = `${currentIndex + 1} / ${quizData.length}`;
+    // 路由控制
+    function startQuiz(category) {
+        currentQuizSet = (category === '全部') 
+            ? [...allQuestions].sort(() => Math.random() - 0.5)
+            : allQuestions.filter(q => q.cat === category).sort(() => Math.random() - 0.5);
+        
+        currentIndex = 0;
+        document.getElementById('homeView').style.display = 'none';
+        document.getElementById('quizView').style.display = 'block';
+        showQuestion();
     }
 
-    micBtn.addEventListener('click', () => {
-        try {
-            recognition.start();
-            micBtn.innerText = "正在聆聽...";
-            micBtn.style.backgroundColor = "#ffc107";
-        } catch (e) {
-            console.log("辨識已在運行中");
-        }
+    function goHome() {
+        document.getElementById('homeView').style.display = 'block';
+        document.getElementById('quizView').style.display = 'none';
+    }
+
+    // 朗讀功能
+    function speakKorean(text) {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'ko-KR';
+        utter.rate = 0.8; // 稍微慢一點方便學習
+        synth.speak(utter);
+    }
+
+    function showQuestion() {
+        const q = currentQuizSet[currentIndex];
+        document.getElementById('categoryLabel').innerText = q.cat;
+        document.getElementById('displayMeaning').innerText = q.en;
+        document.getElementById('displayKorean').innerText = q.ko;
+        document.getElementById('displayKorean').style.visibility = 'hidden';
+        document.getElementById('result').innerText = "準備好了嗎？";
+        document.getElementById('result').className = "";
+        document.getElementById('micBtn').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'none';
+    }
+
+    document.getElementById('micBtn').addEventListener('click', () => {
+        recognition.start();
+        document.getElementById('micBtn').innerText = "🔴 正在聆聽...";
     });
 
     recognition.onresult = (event) => {
-        const speechToText = event.results[0][0].transcript.trim();
-        const target = quizData[currentIndex].ko.replace(/[\s.,?!]/g, "");
-        const input = speechToText.replace(/[\s.,?!]/g, "");
-
-        micBtn.innerText = "按住說話";
-        micBtn.style.backgroundColor = "#28a745";
+        const transcript = event.results[0][0].transcript.trim();
+        const target = currentQuizSet[currentIndex].ko.replace(/[\s.,?!]/g, "");
+        const input = transcript.replace(/[\s.,?!]/g, "");
+        
+        document.getElementById('micBtn').innerText = "🎤 按住開始回答";
 
         if (input === target) {
-            resultEl.innerText = `✅ 正確！你說了: ${speechToText}`;
-            resultEl.className = "success-text";
-            koreanEl.style.visibility = "visible";
-            micBtn.style.display = "none";
-            nextBtn.style.display = "inline-block";
+            document.getElementById('result').innerHTML = `✅ 答對了！<br>你說：${transcript}`;
+            document.getElementById('result').className = "success-text";
+            document.getElementById('displayKorean').style.visibility = 'visible';
+            document.getElementById('micBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
         } else {
-            resultEl.innerText = `❌ 聽起來像是: ${speechToText}`;
-            resultEl.className = "error-text";
+            document.getElementById('result').innerHTML = `❌ 聽起來像是：${transcript}<br>聽聽正確讀音...`;
+            document.getElementById('result').className = "error-text";
+            // 自動播放正確朗讀
+            speakKorean(currentQuizSet[currentIndex].ko);
         }
     };
 
-    recognition.onerror = () => {
-        micBtn.innerText = "按住說話";
-        micBtn.style.backgroundColor = "#28a745";
-        resultEl.innerText = "沒聽清楚，請再試一次";
-    };
-
-    nextBtn.addEventListener('click', () => {
+    document.getElementById('nextBtn').addEventListener('click', () => {
         currentIndex++;
-        if (currentIndex < quizData.length) {
-            updateUI();
+        if (currentIndex < currentQuizSet.length) {
+            showQuestion();
         } else {
-            catLabel.innerText = "完成";
-            meaningEl.innerText = "🎉 今天的練習結束囉！";
-            koreanEl.style.visibility = "hidden";
-            nextBtn.style.display = "none";
-            micBtn.innerText = "重新開始";
-            micBtn.style.display = "inline-block";
-            currentIndex = -1; // 點擊後重新開始
+            alert("本單元練習完成！");
+            goHome();
         }
     });
-
-    // 初始化
-    updateUI();
 </script>
 
 </body>
