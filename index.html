@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sue 的韓文單字特訓</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; }
+        h1 { color: #333; font-size: 24px; }
+        .meaning { font-size: 20px; font-weight: bold; color: #0056b3; margin: 20px 0; }
+        .hint { color: #888; font-size: 14px; margin-bottom: 20px; }
+        .korean-text { font-size: 32px; font-weight: bold; color: #333; margin-bottom: 30px; display: none; }
+        button { background-color: #28a745; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: 0.3s; margin: 5px; }
+        button:hover { background-color: #218838; }
+        #nextBtn { background-color: #007bff; display: none; }
+        #nextBtn:hover { background-color: #0056b3; }
+        #result { margin-top: 20px; font-size: 18px; font-weight: bold; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>📝 單字口說挑戰</h1>
+    <div class="hint">請唸出符合以下情境的韓文單字：</div>
+    
+    <div class="meaning" id="questionMeaning">載入中...</div>
+    
+    <div class="korean-text" id="answerText"></div>
+    
+    <div>
+        <button id="micBtn">🎤 按住開始回答</button>
+        <button id="nextBtn">下一題 ➡️</button>
+    </div>
+    <p id="result">準備好了嗎？</p>
+</div>
+
+<script>
+    // 建立題庫資料 (陣列)
+    const quizData = [
+        { 
+            korean: "퇴직", 
+            meaning: "official - retire (expired)" 
+        },
+        { 
+            korean: "퇴사", 
+            meaning: "personal - leave (tired/new job/career change)" 
+        },
+        { 
+            korean: "퇴근", 
+            meaning: "just for today (finished work and go home)" 
+        }
+    ];
+
+    let currentIndex = 0; // 記錄目前在哪一題
+
+    // 抓取畫面上的元素
+    const questionMeaning = document.getElementById('questionMeaning');
+    const answerText = document.getElementById('answerText');
+    const micBtn = document.getElementById('micBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultText = document.getElementById('result');
+
+    // 載入題目的函數
+    function loadQuestion() {
+        const currentQuiz = quizData[currentIndex];
+        questionMeaning.innerText = currentQuiz.meaning;
+        answerText.innerText = currentQuiz.korean;
+        answerText.style.display = "none"; // 隱藏答案
+        resultText.innerText = "等待錄音...";
+        resultText.className = "";
+        nextBtn.style.display = "none"; // 隱藏下一題按鈕
+        micBtn.style.display = "inline-block"; // 顯示麥克風按鈕
+    }
+
+    // 初始化第一題
+    loadQuestion();
+
+    // 語音辨識設定
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ko-KR'; 
+    recognition.interimResults = false;
+
+    micBtn.addEventListener('click', () => {
+        recognition.start();
+        micBtn.innerText = "🔴 聆聽中...";
+        resultText.innerText = "請說話...";
+    });
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.trim();
+        micBtn.innerText = "🎤 重新回答";
+        
+        const cleanTranscript = transcript.replace(/[\s.,?!]/g, "");
+        const cleanTarget = quizData[currentIndex].korean.replace(/[\s.,?!]/g, "");
+
+        if (cleanTranscript === cleanTarget) {
+            resultText.innerHTML = `✅ 正確！你說了：${transcript}`;
+            resultText.className = "success";
+            answerText.style.display = "block"; // 顯示正確韓文
+            micBtn.style.display = "none"; // 隱藏麥克風
+            nextBtn.style.display = "inline-block"; // 顯示下一題按鈕
+        } else {
+            resultText.innerHTML = `❌ 不太對喔！系統聽到的是：${transcript}`;
+            resultText.className = "error";
+        }
+    };
+
+    recognition.onerror = (event) => {
+        micBtn.innerText = "🎤 按住開始回答";
+        resultText.innerText = "沒聽到聲音，請重試。";
+    };
+
+    // 下一題按鈕邏輯
+    nextBtn.addEventListener('click', () => {
+        currentIndex++;
+        // 檢查是否還有題目
+        if (currentIndex < quizData.length) {
+            loadQuestion();
+            micBtn.innerText = "🎤 按住開始回答";
+        } else {
+            // 測驗結束
+            questionMeaning.innerText = "🎉 恭喜你完成所有單字測驗！";
+            answerText.style.display = "none";
+            nextBtn.style.display = "none";
+            resultText.innerText = "";
+            
+            // 加入一個重新開始的按鈕功能
+            setTimeout(() => {
+                currentIndex = 0;
+                loadQuestion();
+                micBtn.innerText = "🎤 按住開始回答";
+            }, 3000); // 3秒後重新開始
+        }
+    });
+</script>
+
+</body>
+</html>
