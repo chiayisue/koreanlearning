@@ -36,10 +36,19 @@
         }
         
         /* 首頁樣式 */
-        #homeView { flex: 1; overflow-y: auto; padding-top: 20px; padding-bottom: 20px; }
-        .header { text-align: left; margin-bottom: 30px; }
+        #homeView { flex: 1; overflow-y: auto; padding-top: 10px; padding-bottom: 20px; }
+        .header { text-align: left; margin-bottom: 20px; }
         .header h1 { font-size: 28px; margin: 0; color: var(--primary); }
         .header p { color: #636e72; margin: 5px 0 0; }
+        
+        /* 模式切換按鈕 */
+        .mode-toggle-btn {
+            width: 100%; background: #eef2f7; color: var(--primary); border: 2px solid var(--primary);
+            padding: 12px; border-radius: 15px; font-size: 16px; font-weight: 700;
+            cursor: pointer; margin-bottom: 25px; transition: 0.3s;
+        }
+        .mode-toggle-btn:active { transform: scale(0.98); }
+
         .menu-grid { display: grid; gap: 15px; }
         .menu-item {
             background: var(--card); padding: 25px; border-radius: 20px;
@@ -75,20 +84,30 @@
         .bubble.npc .hint { font-size: 12px; color: #666; margin-top: 4px; border-top: 1px solid #ddd; padding-top: 4px; }
         .bubble.player { background: var(--chat-user); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         
-        .task-card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); text-align: center; flex-shrink: 0; margin-bottom: 10px; border: 2px dashed var(--primary); }
-        .task-label { font-size: 12px; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
-        .task-content { font-size: 18px; font-weight: 700; color: #333; }
-        .task-korean-hint { font-size: 24px; font-weight: 800; color: var(--primary); margin-top: 10px; display: none; }
+        .task-card { background: #eef2f7; padding: 15px; border-radius: 15px; text-align: center; flex-shrink: 0; margin-bottom: 10px; border: 2px solid var(--primary); }
+        .task-label { font-size: 13px; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
+        .task-content { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 10px;}
+        .task-korean-hint { font-size: 24px; font-weight: 800; color: var(--primary); display: none; }
 
         .feedback-area { min-height: 50px; margin: 5px 0; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-align: center; }
         
-        .controls { padding-bottom: 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
-        .mic-btn-container { position: relative; display: flex; justify-content: center; height: 90px; margin-bottom: 10px; }
+        /* 控制區 (包含錄音按鈕與拼字輸入框) */
+        .controls { padding-bottom: 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        
+        /* 錄音按鈕 */
+        .mic-btn-container { position: relative; display: flex; justify-content: center; height: 90px; margin-bottom: 10px; width: 100%; }
         .mic-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: none; color: white; font-size: 28px; cursor: pointer; box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4); transition: background-color 0.3s; }
         .mic-btn.recording { background: var(--error); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(235, 77, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0); } }
 
+        /* 拼字輸入區 */
+        .spelling-container { display: none; width: 100%; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .spelling-input { width: 90%; max-width: 350px; padding: 15px; border-radius: 12px; border: 2px solid var(--primary); font-size: 18px; text-align: center; font-family: 'Pretendard', sans-serif; outline: none; }
+        .spelling-input:focus { box-shadow: 0 0 8px rgba(74, 144, 226, 0.3); }
+
         .action-btn { background: var(--text); color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: 600; display: none; width: 80%; max-width: 250px; cursor: pointer; }
+        .action-btn.submit-btn { display: inline-block; background: var(--primary); width: 90%; max-width: 350px; border-radius: 12px; }
+        
         .play-btn { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 15px; margin-top: 10px; cursor: pointer; display: none; font-size: 14px; font-weight: 600; margin-left: auto; margin-right: auto; }
         .back-home { margin-top: 20px; background: none; border: none; color: #b2bec3; cursor: pointer; text-decoration: underline; font-size: 14px; }
     </style>
@@ -101,6 +120,11 @@
             <h1>Sue 的韓文學習中心</h1>
             <p>專注於口說與日常應用</p>
         </div>
+        
+        <button id="modeToggleBtn" class="mode-toggle-btn" onclick="toggleInputMode()">
+            🔄 目前模式：🗣️ 口說辨識
+        </button>
+
         <div class="menu-grid">
             <div class="menu-item" style="border: 2px solid var(--primary);" onclick="showScenarioMenu()">
                 <h3>🎭 情境對話</h3><span class="icon">➔</span>
@@ -133,9 +157,14 @@
         </div>
         <div class="feedback-area" id="quizFeedback"></div>
         <div class="controls">
-            <div class="mic-btn-container">
+            <div class="mic-btn-container" id="quizMicContainer">
                 <button class="mic-btn" id="quizMicBtn">🎤</button>
             </div>
+            <div class="spelling-container" id="quizSpellContainer">
+                <input type="text" id="quizSpellInput" class="spelling-input" placeholder="請輸入韓文答案..." autocomplete="off">
+                <button class="action-btn submit-btn" onclick="checkSpelling('quiz')">送出答案</button>
+            </div>
+
             <button class="action-btn" id="nextQuizBtn" onclick="nextQuestion()">下一題 ➔</button>
             <button class="back-home" onclick="goHome()">回首頁</button>
         </div>
@@ -151,24 +180,29 @@
 
     <div id="rolePlayView">
         <div class="chat-header" id="rpTitle">情境標題</div>
-        <div class="chat-box" id="chatBox"></div>
         
         <div class="task-card">
-            <div class="task-label">你的任務：請用韓文說</div>
+            <div class="task-label">📍 輪到你說：</div>
             <div class="task-content" id="rpTaskHint">準備中...</div>
             <div class="task-korean-hint" id="rpTaskKorean">답변</div>
-            <button id="rpRepeatBtn" class="play-btn" style="margin-top: 10px;" onclick="playRpAudio()">🔊 聽解答讀音</button>
+            <button id="rpRepeatBtn" class="play-btn" style="margin-top: 10px;" onclick="playRpAudio()">🔊 聽正確讀音</button>
         </div>
 
+        <div class="chat-box" id="chatBox"></div>
         <div class="feedback-area" id="rpFeedback"></div>
 
         <div class="controls">
-            <div class="mic-btn-container">
+            <div class="mic-btn-container" id="rpMicContainer">
                 <button class="mic-btn" id="rpMicBtn">🎤</button>
             </div>
+            <div class="spelling-container" id="rpSpellContainer">
+                <input type="text" id="rpSpellInput" class="spelling-input" placeholder="請輸入對話回覆..." autocomplete="off">
+                <button class="action-btn submit-btn" onclick="checkSpelling('roleplay')">送出對話</button>
+            </div>
+
             <button class="action-btn" id="rpNextBtn" onclick="nextRolePlayLine()">繼續對話 ➔</button>
             <button class="action-btn" id="rpFinishBtn" onclick="goHome()">完成對話 🏠</button>
-            <button class="back-home" onclick="goHome()">強制結束</button>
+            <button class="back-home" onclick="goHome()">結束並回首頁</button>
         </div>
     </div>
 </div>
@@ -176,21 +210,17 @@
 <script>
     // --- 擴充題庫 (包含 0415 及 image_84c883 最新筆記) ---
     const allData = [
-        // 既有詞彙
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
         { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更)" },
         { cat: "詞彙", ko: "퇴근", en: "下班 (今日工作結束)" },
         { cat: "詞彙", ko: "옮기다", en: "搬移 / 換 (例如：換公司)" },
         { cat: "詞彙", ko: "최애", en: "最愛 / 偶像" },
-        // 新增詞彙
         { cat: "詞彙", ko: "멋있다", en: "帥氣 / 很酷" },
         { cat: "詞彙", ko: "놀라다", en: "驚訝" },
         { cat: "詞彙", ko: "뿌듯하다", en: "感到驕傲 / 充滿成就感" },
         { cat: "詞彙", ko: "꾸준하다", en: "穩定 / 堅持" },
         { cat: "詞彙", ko: "동작", en: "動作 (Movement)" },
         { cat: "詞彙", ko: "부드럽다", en: "柔軟的 / 溫和的" },
-        
-        // 文法
         { cat: "文法", ko: "해야 돼요", en: "必須做 / 應該做" },
         { cat: "文法", ko: "해도 돼요", en: "可以做 / 做...也沒關係" },
         { cat: "文法", ko: "먹는 음식", en: "「正在吃」的食物" },
@@ -199,8 +229,6 @@
         { cat: "文法", ko: "친구에게", en: "「給/對」朋友 (對象)" },
         { cat: "文法", ko: "들어 줬어요", en: "「幫我」聽 / 傾聽 (為某人做某事)" },
         { cat: "文法", ko: "느낌이 들었어요", en: "有了...的感覺" },
-        
-        // 句型 (包含修正過的運動習慣句子)
         { cat: "句型", ko: "곧 퇴사해서 안 바빠요", en: "「因為」很快就要離職了，所以不忙。" },
         { cat: "句型", ko: "다음 달에 뉴욕에 갈 거예요", en: "下個月我要去紐約" },
         { cat: "句型", ko: "제가 필요 없는 것을 다 팔았어요", en: "我把不需要的東西都賣掉了" },
@@ -209,7 +237,6 @@
         { cat: "句型", ko: "운동을 한 후에 에너지가 더 좋아졌어요", en: "運動之後，精神變得更好了。" }
     ];
 
-    // --- 劇本題庫 (新增：語言交換情境) ---
     const scenarios = [
         {
             id: "cafe",
@@ -233,18 +260,65 @@
         }
     ];
 
-    // --- 全域變數與功能 ---
+    // --- 全域狀態 ---
     let currentSet = [];
     let idx = 0;
     let mistakeBank = [];
     let currentScenario = null;
     let currentLineIdx = 0;
+    let recognitionMode = 'quiz';
+    let inputMode = 'voice'; // 'voice' or 'spelling'
 
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ko-KR';
     recognition.continuous = false;
-    let recognitionMode = 'quiz';
 
+    // --- 模式切換邏輯 ---
+    function toggleInputMode() {
+        inputMode = inputMode === 'voice' ? 'spelling' : 'voice';
+        const btn = document.getElementById('modeToggleBtn');
+        if (inputMode === 'voice') {
+            btn.innerHTML = '🔄 目前模式：🗣️ 口說辨識';
+            btn.style.background = '#eef2f7';
+            btn.style.color = 'var(--primary)';
+        } else {
+            btn.innerHTML = '🔄 目前模式：⌨️ 鍵盤拼字';
+            btn.style.background = 'var(--primary)';
+            btn.style.color = 'white';
+        }
+    }
+
+    // 更新介面輸入方式 (口說 vs 拼字)
+    function setupInputUI(viewPrefix) {
+        const micContainer = document.getElementById(`${viewPrefix}MicContainer`);
+        const spellContainer = document.getElementById(`${viewPrefix}SpellContainer`);
+        const spellInput = document.getElementById(`${viewPrefix}SpellInput`);
+        const nextBtn = document.getElementById(`${viewPrefix === 'quiz' ? 'nextQuizBtn' : 'rpNextBtn'}`);
+        
+        // 隱藏下一題按鈕
+        nextBtn.style.display = 'none';
+
+        if (inputMode === 'voice') {
+            micContainer.style.display = 'flex';
+            spellContainer.style.display = 'none';
+        } else {
+            micContainer.style.display = 'none';
+            spellContainer.style.display = 'flex';
+            spellInput.value = '';
+            // 給予小延遲讓畫面渲染後再 focus
+            setTimeout(() => spellInput.focus(), 100);
+        }
+    }
+
+    // 綁定 Enter 鍵送出
+    document.getElementById('quizSpellInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') checkSpelling('quiz');
+    });
+    document.getElementById('rpSpellInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') checkSpelling('roleplay');
+    });
+
+    // --- 音訊 ---
     function playAudio(text) { speak(text || document.getElementById('targetKorean').innerText); }
     function playRpAudio(text) { speak(text || document.getElementById('rpTaskKorean').innerText); }
     function speak(text) {
@@ -256,6 +330,7 @@
         window.speechSynthesis.speak(utter);
     }
 
+    // --- 畫面導航 ---
     function hideAllViews() {
         ['homeView', 'quizView', 'scenarioMenuView', 'rolePlayView'].forEach(id => {
             document.getElementById(id).style.display = 'none';
@@ -305,9 +380,9 @@
         document.getElementById('targetKorean').style.visibility = 'hidden';
         document.getElementById('quizFeedback').innerText = "";
         document.getElementById('progressFill').style.width = `${((idx) / currentSet.length) * 100}%`;
-        document.getElementById('quizMicBtn').parentElement.style.display = 'flex';
-        document.getElementById('nextQuizBtn').style.display = 'none';
         document.getElementById('repeatBtn').style.display = 'none';
+        
+        setupInputUI('quiz');
     }
 
     function nextQuestion() {
@@ -357,9 +432,9 @@
         document.getElementById('rpTaskKorean').style.display = 'none'; 
         document.getElementById('rpRepeatBtn').style.display = 'none';
         document.getElementById('rpFeedback').innerText = "";
-        document.getElementById('rpMicBtn').parentElement.style.display = 'flex';
-        document.getElementById('rpNextBtn').style.display = 'none';
         document.getElementById('rpFinishBtn').style.display = 'none';
+        
+        setupInputUI('rp');
     }
 
     function nextRolePlayLine() {
@@ -372,13 +447,80 @@
             bubble.innerHTML = `🎉 對話完成！做得好！`;
             chatBox.appendChild(bubble);
             chatBox.scrollTop = chatBox.scrollHeight;
+            
             document.querySelector('.task-card').style.display = 'none';
+            document.getElementById('rpMicContainer').style.display = 'none';
+            document.getElementById('rpSpellContainer').style.display = 'none';
             document.getElementById('rpNextBtn').style.display = 'none';
             document.getElementById('rpFinishBtn').style.display = 'inline-block';
         }
     }
 
-    // --- 語音辨識處理 ---
+    // --- 驗證與比對邏輯 (共用核心) ---
+    function processAnswer(inputRaw, mode) {
+        const cleanInput = inputRaw.replace(/[\s.,?!]/g, "");
+        
+        if (mode === 'quiz') {
+            const currentQ = currentSet[idx];
+            const target = currentQ.ko.replace(/[\s.,?!]/g, "");
+            
+            if (cleanInput === target) {
+                document.getElementById('quizFeedback').innerHTML = `✅ 完美！`;
+                document.getElementById('quizFeedback').style.color = 'var(--success)';
+                document.getElementById('targetKorean').style.visibility = 'visible';
+                
+                document.getElementById('quizMicContainer').style.display = 'none';
+                document.getElementById('quizSpellContainer').style.display = 'none';
+                document.getElementById('nextQuizBtn').style.display = 'inline-block';
+                document.getElementById('repeatBtn').style.display = 'block';
+                document.getElementById('progressFill').style.width = `${((idx + 1) / currentSet.length) * 100}%`;
+            } else {
+                document.getElementById('quizFeedback').innerText = `❌ 錯誤：你輸入/說了 "${inputRaw}"`;
+                document.getElementById('quizFeedback').style.color = 'var(--error)';
+                document.getElementById('targetKorean').style.visibility = 'visible'; 
+                document.getElementById('repeatBtn').style.display = 'block';
+                playAudio(currentQ.ko);
+                if (!mistakeBank.some(item => item.ko === currentQ.ko)) mistakeBank.push(currentQ);
+            }
+        } 
+        else if (mode === 'roleplay') {
+            const targetKo = currentScenario.lines[currentLineIdx].userKo;
+            const targetClean = targetKo.replace(/[\s.,?!]/g, "");
+            
+            if (cleanInput === targetClean) {
+                document.getElementById('rpFeedback').innerText = "✅ 回覆成功！";
+                document.getElementById('rpFeedback').style.color = 'var(--success)';
+                document.getElementById('rpTaskKorean').style.display = 'block';
+                
+                const chatBox = document.getElementById('chatBox');
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble player';
+                bubble.innerText = inputRaw;
+                chatBox.appendChild(bubble);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                document.getElementById('rpMicContainer').style.display = 'none';
+                document.getElementById('rpSpellContainer').style.display = 'none';
+                document.getElementById('rpNextBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('rpFeedback').innerText = `❌ 錯誤：你輸入/說了 "${inputRaw}"`;
+                document.getElementById('rpFeedback').style.color = 'var(--error)';
+                document.getElementById('rpTaskKorean').style.display = 'block'; 
+                document.getElementById('rpRepeatBtn').style.display = 'inline-block';
+                playRpAudio(targetKo); 
+            }
+        }
+    }
+
+    // 處理拼字送出
+    function checkSpelling(mode) {
+        const inputEl = mode === 'quiz' ? document.getElementById('quizSpellInput') : document.getElementById('rpSpellInput');
+        const answer = inputEl.value.trim();
+        if (!answer) return;
+        processAnswer(answer, mode);
+    }
+
+    // 處理語音送出
     document.getElementById('quizMicBtn').addEventListener('click', startListening);
     document.getElementById('rpMicBtn').addEventListener('click', startListening);
 
@@ -393,54 +535,8 @@
 
     recognition.onresult = (event) => {
         const result = event.results[0][0].transcript.trim();
-        const cleanResult = result.replace(/[\s.,?!]/g, "");
-        
-        if (recognitionMode === 'quiz') {
-            document.getElementById('quizMicBtn').classList.remove('recording');
-            const currentQ = currentSet[idx];
-            const target = currentQ.ko.replace(/[\s.,?!]/g, "");
-            
-            if (cleanResult === target) {
-                document.getElementById('quizFeedback').innerHTML = `✅ 完美！`;
-                document.getElementById('quizFeedback').style.color = 'var(--success)';
-                document.getElementById('targetKorean').style.visibility = 'visible';
-                document.getElementById('quizMicBtn').parentElement.style.display = 'none';
-                document.getElementById('nextQuizBtn').style.display = 'inline-block';
-                document.getElementById('repeatBtn').style.display = 'block';
-                document.getElementById('progressFill').style.width = `${((idx + 1) / currentSet.length) * 100}%`;
-            } else {
-                document.getElementById('quizFeedback').innerText = `❌ 聽起來像 "${result}"`;
-                document.getElementById('quizFeedback').style.color = 'var(--error)';
-                document.getElementById('targetKorean').style.visibility = 'visible'; 
-                document.getElementById('repeatBtn').style.display = 'block';
-                playAudio(currentQ.ko);
-                if (!mistakeBank.some(item => item.ko === currentQ.ko)) mistakeBank.push(currentQ);
-            }
-        } else if (recognitionMode === 'roleplay') {
-            document.getElementById('rpMicBtn').classList.remove('recording');
-            const targetKo = currentScenario.lines[currentLineIdx].userKo;
-            const targetClean = targetKo.replace(/[\s.,?!]/g, "");
-            
-            if (cleanResult === targetClean) {
-                document.getElementById('rpFeedback').innerText = "✅ 回覆成功！";
-                document.getElementById('rpFeedback').style.color = 'var(--success)';
-                document.getElementById('rpTaskKorean').style.display = 'block';
-                const chatBox = document.getElementById('chatBox');
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble player';
-                bubble.innerText = result;
-                chatBox.appendChild(bubble);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                document.getElementById('rpMicBtn').parentElement.style.display = 'none';
-                document.getElementById('rpNextBtn').style.display = 'inline-block';
-            } else {
-                document.getElementById('rpFeedback').innerText = `❌ 聽起來像 "${result}"，請看提示再試一次`;
-                document.getElementById('rpFeedback').style.color = 'var(--error)';
-                document.getElementById('rpTaskKorean').style.display = 'block'; 
-                document.getElementById('rpRepeatBtn').style.display = 'inline-block';
-                playRpAudio(targetKo); 
-            }
-        }
+        document.querySelectorAll('.mic-btn').forEach(btn => btn.classList.remove('recording'));
+        processAnswer(result, recognitionMode);
     };
 
     recognition.onerror = () => {
