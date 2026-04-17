@@ -9,20 +9,23 @@
     <style>
         :root {
             --primary: #4a90e2;
+            --primary-light: #eef5fc;
             --success: #28a745;
             --error: #eb4d4b;
             --warning: #f39c12;
-            --bg: #f5f7fa;
+            --bg: #f8f9fa; /* 更乾淨的高端淺灰底色 */
             --card: #ffffff;
-            --text: #2d3436;
-            --chat-npc: #e9ecef;
+            --text-main: #1e272e;
+            --text-muted: #636e72;
+            --chat-npc: #f1f2f6;
             --chat-user: #4a90e2;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            font-family: 'Pretendard', -apple-system, sans-serif; 
-            background-color: var(--bg); color: var(--text);
+            /* Pretendard 是目前韓國最主流的高質感無襯線字體 */
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background-color: var(--bg); color: var(--text-main);
             margin: 0; padding: 0; 
             display: flex; justify-content: center;
             height: 100dvh; overflow: hidden;
@@ -33,114 +36,207 @@
             width: 100%; max-width: 500px; 
             height: 100%; 
             display: flex; flex-direction: column; 
-            padding: 15px; 
+            padding: 20px 15px; 
         }
         
-        /* 首頁樣式還原 */
-        #homeView { flex: 1; overflow-y: auto; padding-top: 10px; padding-bottom: 20px; }
-        .header { text-align: left; margin-bottom: 20px; }
-        .header h1 { font-size: 28px; margin: 0; color: var(--primary); }
-        .header p { color: #636e72; margin: 5px 0 0; }
+        /* 首頁樣式 */
+        #homeView { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+        .header { text-align: left; margin-bottom: 25px; padding: 0 5px; }
+        .header h1 { font-size: 28px; font-weight: 800; margin: 0; color: var(--primary); letter-spacing: -0.5px; }
+        .header p { color: var(--text-muted); margin: 6px 0 0; font-size: 15px; font-weight: 500; }
         
         .mode-toggle-btn {
-            width: 100%; background: #eef2f7; color: var(--primary); border: 2px solid var(--primary);
-            padding: 12px; border-radius: 15px; font-size: 16px; font-weight: 700;
-            cursor: pointer; margin-bottom: 25px; transition: 0.3s;
+            width: 100%; background: var(--primary-light); color: var(--primary); border: none;
+            padding: 15px; border-radius: 16px; font-size: 16px; font-weight: 700;
+            cursor: pointer; margin-bottom: 25px; transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.1);
         }
+        .mode-toggle-btn:active { transform: scale(0.98); }
 
-        .menu-grid { display: grid; gap: 15px; }
+        .menu-grid { display: grid; gap: 12px; }
         .menu-item {
-            background: var(--card); padding: 25px; border-radius: 20px;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05); cursor: pointer;
-            transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.05);
+            background: var(--card); padding: 22px; border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.03); cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(0,0,0,0.02);
             display: flex; align-items: center; justify-content: space-between;
         }
-        .menu-item:active { transform: scale(0.97); }
+        .menu-item:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .menu-item h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .menu-icon { color: var(--primary); font-weight: bold; }
         
         #mistakeBtn { background: #fff5f5; border: 1px solid #ffcccc; display: none; }
-        .mistake-badge { background: var(--error); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px; margin-left: 10px; }
+        .mistake-badge { background: var(--error); color: white; padding: 2px 8px; border-radius: 12px; font-size: 13px; font-weight: bold; margin-left: 10px; }
 
+        /* 測驗進度條 */
+        .progress-bar { width: 100%; height: 6px; background: #dfe6e9; border-radius: 3px; margin-bottom: 20px; flex-shrink: 0; overflow: hidden; }
+        #progressFill { width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        
         /* 介面佈局 */
         #quizView, #scenarioMenuView, #rolePlayView { display: none; flex-direction: column; height: 100%; }
         
-        .progress-bar { width: 100%; height: 6px; background: #dfe6e9; border-radius: 3px; margin-bottom: 20px; flex-shrink: 0; }
-        #progressFill { width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: 0.3s; }
+        /* =============== 💡 字體大小強制鎖定區 (Premium Look) =============== */
+        .question-card { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 0 10px; text-align: center; }
         
-        .question-card { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 10px; min-height: 0; position: relative; text-align: center; }
-        .meaning-text { font-size: 24px; font-weight: 700; color: #2d3436; margin-bottom: 15px; line-height: 1.4; }
-        .correct-answer { font-size: 30px; font-weight: 800; color: var(--primary); margin-top: 10px; visibility: hidden; line-height: 1.3; }
+        #catTag { font-size: 14px; font-weight: 700; color: var(--primary); letter-spacing: 1px; margin-bottom: 15px; }
         
-        .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding: 10px; margin-bottom: 10px; }
-        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 16px; line-height: 1.4; }
-        .bubble.npc { background: var(--chat-npc); align-self: flex-start; border-bottom-left-radius: 4px; }
-        .bubble.npc .hint { font-size: 12px; color: #666; margin-top: 4px; border-top: 1px solid #ddd; padding-top: 4px; }
-        .bubble.player { background: var(--chat-user); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        
-        .task-card { background: #eef2f7; padding: 12px; border-radius: 12px; text-align: center; border: 2px solid var(--primary); margin-bottom: 10px; position: relative; }
-        .task-label { font-size: 13px; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
-        .task-content { font-size: 18px; font-weight: 700; color: #333; }
-
-        /* 文法彈窗 */
-        .grammar-btn { 
-            background: #fff3cd; color: #856404; border: 1px solid #ffeeba; 
-            padding: 6px 15px; border-radius: 20px; font-size: 14px; font-weight: 700; 
-            cursor: pointer; display: none; margin: 0 auto 10px auto;
+        /* 測驗模式：中文意思 */
+        .meaning-text { 
+            font-size: 24px !important; /* 鎖定大小 */
+            font-weight: 800 !important; 
+            color: var(--text-main); 
+            line-height: 1.4; 
+            margin-bottom: 15px; 
+            letter-spacing: 0.5px;
         }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; position: relative; }
+        
+        /* 測驗模式：韓文答案 */
+        .correct-answer { 
+            font-size: 30px !important; /* 鎖定大小 */
+            font-weight: 800 !important; 
+            color: var(--primary); 
+            margin-top: 10px; 
+            visibility: hidden; 
+            line-height: 1.3; 
+        }
+
+        /* 播放按鈕 */
+        .play-btn { 
+            font-size: 16px !important; /* 鎖定大小 */
+            font-weight: 700 !important;
+            background: white; 
+            color: var(--primary); 
+            border: 2px solid var(--primary); 
+            padding: 10px 24px !important; 
+            border-radius: 25px !important; 
+            margin-top: 15px; 
+            cursor: pointer; 
+            display: none; 
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.1);
+            transition: all 0.2s;
+        }
+        .play-btn:active { transform: scale(0.95); }
+
+        /* 情境對話：高端卡片設計 */
+        .task-card { 
+            background: var(--card); 
+            padding: 20px; 
+            border-radius: 20px; 
+            text-align: center; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04); 
+            border: 1px solid rgba(0,0,0,0.02);
+            border-top: 4px solid var(--primary);
+            margin-bottom: 15px; 
+            position: relative; 
+        }
+        .task-label { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
+        
+        /* 情境對話：中文提示 */
+        .task-content { 
+            font-size: 24px !important; /* 鎖定大小 */
+            font-weight: 800 !important; 
+            color: var(--text-main); 
+            line-height: 1.4;
+        }
+
+        /* 情境對話：韓文解答 */
+        .task-korean-hint {
+            font-size: 28px !important; /* 鎖定大小 */
+            font-weight: 800 !important;
+            color: var(--primary);
+            margin-top: 10px;
+            display: none;
+        }
+        /* =================================================================== */
+
+        /* 對話氣泡 */
+        .chat-header { text-align: center; font-size: 18px; font-weight: 800; margin-bottom: 15px; color: var(--text-main); }
+        .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding: 5px 10px; margin-bottom: 10px; }
+        .bubble { max-width: 82%; padding: 14px 18px; border-radius: 20px; font-size: 16px; line-height: 1.5; font-weight: 500; }
+        .bubble.npc { background: var(--chat-npc); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .bubble.npc .hint { font-size: 13px; color: var(--text-muted); margin-top: 6px; border-top: 1px solid #dfe6e9; padding-top: 6px; }
+        .bubble.player { background: var(--chat-user); color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2); }
+        
+        /* 文法彈窗按鈕 (優化為精緻的 Badge) */
+        .grammar-btn { 
+            background: #fff8e1; color: #f39c12; border: none; 
+            padding: 6px 14px; border-radius: 12px; font-size: 14px; font-weight: 800; 
+            cursor: pointer; display: none; margin: 0 auto 15px auto;
+            box-shadow: 0 2px 8px rgba(243, 156, 18, 0.15);
+        }
+
+        /* 模態彈窗 (Modal) */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(3px); }
+        .modal-content { background: white; padding: 30px 25px; border-radius: 24px; width: 100%; max-width: 400px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.15); line-height: 1.6; }
+        .close-modal { position: absolute; top: 15px; right: 15px; background: #f1f2f6; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; color: #666; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
         /* 回饋與紅字標記 */
-        .feedback-area { min-height: 70px; margin: 5px 0; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1.5; }
-        .typo-highlight { color: var(--error); background-color: #ffeaea; padding: 0 2px; border-radius: 4px; text-decoration: underline; font-weight: 800; }
+        .feedback-area { min-height: 70px; margin: 5px 0; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1.5; font-size: 16px; }
+        .typo-highlight { color: var(--error); background-color: #ffeaea; padding: 0 3px; border-radius: 4px; text-decoration: underline; text-decoration-color: var(--error); text-underline-offset: 3px; font-weight: 800; }
 
-        .controls { padding-bottom: 15px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .mic-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: none; color: white; font-size: 28px; cursor: pointer; box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4); }
-        .mic-btn.recording { background: var(--error); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(235, 77, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0); } }
+        /* 底部控制區 */
+        .controls { padding-bottom: 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        
+        .mic-btn-container { position: relative; display: flex; justify-content: center; height: 90px; margin-bottom: 5px; width: 100%; }
+        .mic-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: none; color: white; font-size: 32px; cursor: pointer; box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
+        .mic-btn:active { transform: scale(0.92); }
+        .mic-btn.recording { background: var(--error); animation: pulse 1.5s infinite; box-shadow: 0 8px 25px rgba(235, 77, 75, 0.4); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0.5); } 70% { box-shadow: 0 0 0 20px rgba(235, 77, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0); } }
 
-        .spelling-container { display: none; width: 100%; flex-direction: column; align-items: center; gap: 8px; padding: 12px; background: white; border-radius: 15px; border: 1px solid #e1e8ed; }
-        .spelling-hint { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 2px; text-align: center; }
-        .spelling-input { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--primary); font-size: 16px; text-align: center; outline: none; }
+        .spelling-container { display: none; width: 100%; flex-direction: column; align-items: center; gap: 10px; padding: 15px; background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02); margin-bottom: 5px; }
+        .spelling-hint { font-size: 15px; font-weight: 700; color: var(--primary); text-align: center; }
+        .spelling-input { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #e1e8ed; font-size: 18px; font-weight: 600; text-align: center; outline: none; transition: 0.3s; }
+        .spelling-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1); }
 
-        .action-btn { background: var(--text); color: white; border: none; padding: 12px 40px; border-radius: 25px; font-size: 16px; font-weight: 600; display: none; width: 80%; cursor: pointer; }
+        .action-btn { background: var(--text-main); color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: 700; display: none; width: 85%; max-width: 300px; cursor: pointer; box-shadow: 0 6px 15px rgba(0,0,0,0.1); transition: 0.2s; }
+        .action-btn:active { transform: scale(0.96); }
         .action-btn.submit-btn { display: inline-block; background: var(--primary); width: 100%; }
-        .play-btn { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 15px; margin-top: 10px; cursor: pointer; display: none; }
-        .back-home { margin-top: 15px; background: none; border: none; color: #b2bec3; text-decoration: underline; font-size: 14px; cursor: pointer; }
+        
+        .back-home { margin-top: 15px; background: none; border: none; color: #a4b0be; text-decoration: underline; font-size: 14px; font-weight: 600; cursor: pointer; padding: 5px; }
     </style>
 </head>
 <body>
 
 <div class="modal-overlay" id="grammarModal">
     <div class="modal-content">
-        <button style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:24px; cursor:pointer;" onclick="closeGrammarModal()">×</button>
-        <div style="font-size:20px; font-weight:800; color:var(--primary); margin-bottom:15px; border-bottom:2px solid #f0f0f0;">📖 文法小抄</div>
-        <div id="grammarContent"></div>
+        <button class="close-modal" onclick="closeGrammarModal()">✕</button>
+        <div style="font-size:22px; font-weight:800; color:var(--primary); margin-bottom:15px; border-bottom:2px solid #f1f2f6; padding-bottom:10px;">📖 文法筆記</div>
+        <div id="grammarContent" style="color:var(--text-main); font-size:16px;"></div>
     </div>
 </div>
 
 <div class="app-container">
     <div id="homeView">
         <div class="header">
-            <h1>Sue 的韓文學習中心</h1>
-            <p>專注於口說與日常應用</p>
+            <h1>Sue's Korean Hub</h1>
+            <p>專注於口說與日常實戰</p>
         </div>
         
-        <button id="modeToggleBtn" class="mode-toggle-btn" onclick="toggleInputMode()">🔄 模式：🗣️ 口說辨識</button>
+        <button id="modeToggleBtn" class="mode-toggle-btn" onclick="toggleInputMode()">🔄 目前模式：🗣️ 語音口說</button>
 
         <div class="menu-grid">
-            <div class="menu-item" style="border: 2px solid var(--primary);" onclick="showScenarioMenu()"><h3>🎭 情境對話</h3><span>➔</span></div>
-            <div class="menu-item" onclick="startQuiz('詞彙')"><h3>📚 核心詞彙</h3><span>➔</span></div>
-            <div class="menu-item" onclick="startQuiz('文法')"><h3>⚙️ 語法辨析</h3><span>➔</span></div>
-            <div class="menu-item" onclick="startQuiz('句型')"><h3>💬 實用長句</h3><span>➔</span></div>
-            <div class="menu-item" id="mistakeBtn" onclick="startMistakeQuiz()"><h3>🔥 弱點複習 <span id="mistakeCount" class="mistake-badge">0</span></h3><span>➔</span></div>
+            <div class="menu-item" style="border-left: 5px solid var(--primary);" onclick="showScenarioMenu()">
+                <h3>🎭 情境對話</h3><span class="menu-icon">➔</span>
+            </div>
+            <div class="menu-item" onclick="startQuiz('詞彙')">
+                <h3>📚 核心詞彙</h3><span class="menu-icon">➔</span>
+            </div>
+            <div class="menu-item" onclick="startQuiz('文法')">
+                <h3>⚙️ 語法辨析</h3><span class="menu-icon">➔</span>
+            </div>
+            <div class="menu-item" onclick="startQuiz('句型')">
+                <h3>💬 實用長句</h3><span class="menu-icon">➔</span>
+            </div>
+            <div class="menu-item" id="mistakeBtn" onclick="startMistakeQuiz()" style="border-left: 5px solid var(--error);">
+                <h3 style="color: var(--error);">🔥 弱點複習 <span id="mistakeCount" class="mistake-badge">0</span></h3><span style="color: var(--error);">➔</span>
+            </div>
         </div>
     </div>
 
     <div id="quizView">
         <div class="progress-bar"><div id="progressFill"></div></div>
         <div class="question-card">
-            <div id="catTag" style="font-size: 12px; color: var(--primary); font-weight: 600; margin-bottom: 10px;"></div>
-            <button id="quizGrammarBtn" class="grammar-btn" onclick="openGrammarModal('quiz')">💡 查看文法提示</button>
+            <div id="catTag"></div>
+            <button id="quizGrammarBtn" class="grammar-btn" onclick="openGrammarModal('quiz')">💡 文法提示</button>
             <div class="meaning-text" id="targetMeaning"></div>
             <div class="correct-answer" id="targetKorean"></div>
             <button id="repeatBtn" class="play-btn" onclick="playAudio()">🔊 聽正確發音</button>
@@ -150,26 +246,28 @@
             <div id="quizMicContainer"><button class="mic-btn" id="quizMicBtn">🎤</button></div>
             <div class="spelling-container" id="quizSpellContainer">
                 <div class="spelling-hint" id="quizSpellHint"></div>
-                <input type="text" id="quizSpellInput" class="spelling-input" placeholder="請輸入韓文...">
+                <input type="text" id="quizSpellInput" class="spelling-input" placeholder="請輸入韓文..." autocomplete="off">
                 <button class="action-btn submit-btn" onclick="checkSpelling('quiz')">送出答案</button>
             </div>
             <button class="action-btn" id="nextQuizBtn" onclick="nextQuestion()">下一題 ➔</button>
-            <button class="back-home" onclick="goHome()">回首頁</button>
+            <button class="back-home" onclick="goHome()">🏠 回首頁</button>
         </div>
     </div>
 
     <div id="scenarioMenuView">
         <div class="header"><h1>選擇對話情境</h1></div>
         <div class="menu-grid" id="scenarioList"></div>
-        <button class="back-home" onclick="goHome()">回首頁</button>
+        <button class="back-home" onclick="goHome()">🏠 回首頁</button>
     </div>
 
     <div id="rolePlayView">
         <div class="chat-header" id="rpTitle"></div>
         <div class="task-card">
-            <button id="rpGrammarBtn" class="grammar-btn" onclick="openGrammarModal('roleplay')">💡 查看文法提示</button>
+            <button id="rpGrammarBtn" class="grammar-btn" onclick="openGrammarModal('roleplay')">💡 文法提示</button>
             <div class="task-label">📍 輪到你說：</div>
             <div class="task-content" id="rpTaskHint"></div>
+            <div class="task-korean-hint" id="rpTaskKorean"></div>
+            <button id="rpRepeatBtn" class="play-btn" style="margin: 15px auto 0;" onclick="playRpAudio()">🔊 聽正確發音</button>
         </div>
         <div class="chat-box" id="chatBox"></div>
         <div class="feedback-area" id="rpFeedback"></div>
@@ -177,12 +275,12 @@
             <div id="rpMicContainer"><button class="mic-btn" id="rpMicBtn">🎤</button></div>
             <div class="spelling-container" id="rpSpellContainer">
                 <div class="spelling-hint" id="rpSpellHint"></div>
-                <input type="text" id="rpSpellInput" class="spelling-input" placeholder="請輸入回覆...">
+                <input type="text" id="rpSpellInput" class="spelling-input" placeholder="請輸入回覆..." autocomplete="off">
                 <button class="action-btn submit-btn" onclick="checkSpelling('roleplay')">送出對話</button>
             </div>
             <button class="action-btn" id="rpNextBtn" onclick="nextRolePlayLine()">繼續對話 ➔</button>
             <button class="action-btn" id="rpFinishBtn" onclick="goHome()">完成對話 🏠</button>
-            <button class="back-home" onclick="goHome()">回首頁</button>
+            <button class="back-home" onclick="goHome()">🏠 結束並回首頁</button>
         </div>
     </div>
 </div>
@@ -192,8 +290,8 @@
     const allData = [
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
         { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更)" },
-        { cat: "文法", ko: "퇴직할 때", en: "退休的時候", grammarNote: "<b>-(으)ㄹ 때 (表示「當...的時候」)</b><br>動詞字幹沒有收音時，接 -ㄹ 때。" },
-        { cat: "文法", ko: "직전이라서", en: "因為是前夕", grammarNote: "<b>(이)라서 (表示原因)</b><br>名詞有收音用 이라서，無收音用 라서。" },
+        { cat: "文法", ko: "퇴직할 때", en: "退休的時候", grammarNote: "<b>-(으)ㄹ 때 (表示「當...的時候」)</b><br><br>動詞字幹沒有收音時，接 -ㄹ 때。" },
+        { cat: "文法", ko: "직전이라서", en: "因為是前夕", grammarNote: "<b>(이)라서 (表示原因)</b><br><br>名詞有收音用 이라서，無收音用 라서。" },
         { cat: "句型", ko: "퇴사 직전이라서 조금 바빠요", en: "因為是離職前夕，所以有點忙。" },
         { cat: "句型", ko: "오랜만의 집이라서 기대돼요", en: "因為是好久沒回去的家，所以很期待。" },
         { cat: "句型", ko: "운동을 한 후에 에너지가 더 좋아졌어요", en: "運動之後，精神變得更好了。" }
@@ -215,8 +313,9 @@
     let currentSet = [], idx = 0, mistakeBank = [], currentScenario = null, currentLineIdx = 0, inputMode = 'voice';
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ko-KR';
+    recognition.continuous = false;
 
-    // --- 🌟 關鍵修正：90% 高標準容錯門檻 ---
+    // --- 🌟 90% 高標準容錯門檻 ---
     function checkSimilarity(input, target) {
         const clean = s => s.replace(/[\s.,?!]/g, "");
         const s1 = clean(input), s2 = clean(target);
@@ -261,10 +360,11 @@
         if (note) { document.getElementById('grammarContent').innerHTML = note; document.getElementById('grammarModal').style.display = 'flex'; }
     }
     function closeGrammarModal() { document.getElementById('grammarModal').style.display = 'none'; }
+    document.getElementById('grammarModal').addEventListener('click', function(e) { if(e.target === this) closeGrammarModal(); });
 
     function toggleInputMode() {
         inputMode = (inputMode === 'voice') ? 'spelling' : 'voice';
-        document.getElementById('modeToggleBtn').innerText = (inputMode === 'voice') ? '🔄 模式：🗣️ 口說辨識' : '🔄 模式：⌨️ 鍵盤拼字';
+        document.getElementById('modeToggleBtn').innerText = (inputMode === 'voice') ? '🔄 目前模式：🗣️ 語音口說' : '🔄 目前模式：⌨️ 鍵盤拼字';
         if (document.getElementById('quizView').style.display === 'flex') setupInputUI('quiz');
         else if (document.getElementById('rolePlayView').style.display === 'flex') setupInputUI('rp');
     }
@@ -286,28 +386,32 @@
         const score = checkSimilarity(inputRaw, target);
         const feedback = document.getElementById(mode === 'quiz' ? 'quizFeedback' : 'rpFeedback');
 
-        if (score >= 0.9) { // 🌟 要求精準發音，90% 才通關
-            feedback.innerHTML = "✅ 通關！";
+        if (score >= 0.9) { // 🌟 90% 才通關
+            feedback.innerHTML = "✅ 非常標準！";
             feedback.style.color = "var(--success)";
             if (mode === 'quiz') {
                 document.getElementById('targetKorean').style.visibility = 'visible';
                 document.getElementById('quizMicContainer').style.display = 'none';
                 document.getElementById('quizSpellContainer').style.display = 'none';
                 document.getElementById('nextQuizBtn').style.display = 'inline-block';
-                document.getElementById('repeatBtn').style.display = 'block';
+                document.getElementById('repeatBtn').style.display = 'inline-block';
             } else {
                 addChatBubble(inputRaw, 'player');
+                document.getElementById('rpTaskKorean').style.display = 'block';
                 document.getElementById('rpMicContainer').style.display = 'none';
                 document.getElementById('rpSpellContainer').style.display = 'none';
                 document.getElementById('rpNextBtn').style.display = 'inline-block';
             }
         } else {
             const diff = generateDiffHtml(inputRaw, target);
-            feedback.innerHTML = `<span style="color:var(--error);">❌ 聽起來像：</span><br><div style="font-size:18px; font-weight:700;">"${diff}"</div>`;
+            feedback.innerHTML = `<span style="color:var(--error);">❌ 聽起來像：</span><br><div style="font-size:20px; font-weight:800; margin-top:5px; letter-spacing:0.5px;">"${diff}"</div>`;
             if (mode === 'quiz') {
                 document.getElementById('targetKorean').style.visibility = 'visible';
-                document.getElementById('repeatBtn').style.display = 'block';
+                document.getElementById('repeatBtn').style.display = 'inline-block';
                 if (!mistakeBank.some(m => m.ko === target)) mistakeBank.push(currentSet[idx]);
+            } else {
+                document.getElementById('rpTaskKorean').style.display = 'block';
+                document.getElementById('rpRepeatBtn').style.display = 'inline-block';
             }
             speak(target);
         }
@@ -315,6 +419,7 @@
 
     // --- 其他功能 (語音、導航) ---
     function playAudio() { speak(document.getElementById('targetKorean').innerText); }
+    function playRpAudio() { speak(document.getElementById('rpTaskKorean').innerText); }
     function speak(text) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
@@ -335,8 +440,8 @@
     }
     function startMistakeQuiz() {
         if (mistakeBank.length === 0) return;
-        recognitionMode = 'quiz'; currentSet = [...mistakeBank]; mistakeBank = [];
-        hideAllViews(); document.getElementById('quizView').style.display = 'flex'; showQuizQuestion();
+        recognitionMode = 'quiz'; currentSet = [...mistakeBank]; currentSet.sort(() => Math.random() - 0.5); idx = 0;
+        mistakeBank = []; hideAllViews(); document.getElementById('quizView').style.display = 'flex'; showQuizQuestion();
     }
     function showQuizQuestion() {
         const q = currentSet[idx];
@@ -348,15 +453,17 @@
         document.getElementById('progressFill').style.width = `${((idx) / currentSet.length) * 100}%`;
         document.getElementById('quizGrammarBtn').style.display = q.grammarNote ? 'inline-block' : 'none';
         document.getElementById('quizSpellHint').innerText = "✏️ 翻譯：" + q.en;
+        document.getElementById('repeatBtn').style.display = 'none';
         setupInputUI('quiz');
     }
-    function nextQuestion() { idx++; if (idx < currentSet.length) showQuizQuestion(); else goHome(); }
+    function nextQuestion() { idx++; if (idx < currentSet.length) showQuizQuestion(); else { alert("太棒了！本階段練習完成！"); goHome(); } }
+    
     function showScenarioMenu() {
         hideAllViews(); document.getElementById('scenarioMenuView').style.display = 'flex';
         const list = document.getElementById('scenarioList'); list.innerHTML = '';
         scenarios.forEach((s, i) => {
             const div = document.createElement('div'); div.className = 'menu-item'; div.onclick = () => startRolePlay(i);
-            div.innerHTML = `<div><h3>${s.title}</h3><p style="font-size:12px;color:#666;">${s.desc}</p></div><span>➔</span>`;
+            div.innerHTML = `<div><h3>${s.title}</h3><p style="font-size:13px; font-weight:500; color:var(--text-muted); margin-top:5px;">${s.desc}</p></div><span class="menu-icon">➔</span>`;
             list.appendChild(div);
         });
     }
@@ -371,14 +478,24 @@
         addChatBubble(line.npcKo + `<div class="hint">${line.npcZh}</div>`, 'npc');
         speak(line.npcKo);
         document.getElementById('rpTaskHint').innerText = line.userTaskZh;
+        document.getElementById('rpTaskKorean').innerText = line.userKo;
+        document.getElementById('rpTaskKorean').style.display = 'none';
+        document.getElementById('rpRepeatBtn').style.display = 'none';
         document.getElementById('rpFeedback').innerHTML = "";
         document.getElementById('rpGrammarBtn').style.display = line.grammarNote ? 'inline-block' : 'none';
-        document.getElementById('rpSpellHint').innerText = "✏️ 請說：" + line.userTaskZh;
+        document.getElementById('rpSpellHint').innerText = "✏️ 請寫下：" + line.userTaskZh;
         setupInputUI('rp');
     }
     function nextRolePlayLine() {
         currentLineIdx++; if (currentLineIdx < currentScenario.lines.length) playCurrentNpcLine();
-        else document.getElementById('rpFinishBtn').style.display = 'inline-block';
+        else {
+            addChatBubble(`🎉 對話完成！做得好！`, 'npc');
+            document.querySelector('.task-card').style.display = 'none';
+            document.getElementById('rpMicContainer').style.display = 'none';
+            document.getElementById('rpSpellContainer').style.display = 'none';
+            document.getElementById('rpNextBtn').style.display = 'none';
+            document.getElementById('rpFinishBtn').style.display = 'inline-block';
+        }
     }
     function addChatBubble(text, type) {
         const box = document.getElementById('chatBox');
@@ -389,6 +506,9 @@
         const input = document.getElementById(mode === 'quiz' ? 'quizSpellInput' : 'rpSpellInput');
         if (input.value.trim()) processAnswer(input.value.trim(), mode);
     }
+    document.getElementById('quizSpellInput').addEventListener('keypress', e => { if (e.key === 'Enter') checkSpelling('quiz'); });
+    document.getElementById('rpSpellInput').addEventListener('keypress', e => { if (e.key === 'Enter') checkSpelling('roleplay'); });
+
     document.getElementById('quizMicBtn').onclick = () => { recognitionMode = 'quiz'; recognition.start(); document.getElementById('quizMicBtn').classList.add('recording'); };
     document.getElementById('rpMicBtn').onclick = () => { recognitionMode = 'roleplay'; recognition.start(); document.getElementById('rpMicBtn').classList.add('recording'); };
     recognition.onresult = (e) => {
@@ -396,7 +516,11 @@
         document.querySelectorAll('.mic-btn').forEach(b => b.classList.remove('recording'));
         processAnswer(res, recognitionMode);
     };
-    recognition.onerror = () => document.querySelectorAll('.mic-btn').forEach(b => b.classList.remove('recording'));
+    recognition.onerror = () => {
+        document.querySelectorAll('.mic-btn').forEach(b => b.classList.remove('recording'));
+        const feedbackEl = recognitionMode === 'quiz' ? document.getElementById('quizFeedback') : document.getElementById('rpFeedback');
+        feedbackEl.innerHTML = "沒聽清楚，請重試。"; feedbackEl.style.color = 'var(--error)';
+    };
 </script>
 </body>
 </html>
