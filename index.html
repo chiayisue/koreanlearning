@@ -26,13 +26,14 @@
             margin: 0; padding: 0; 
             display: flex; justify-content: center;
             height: 100dvh; overflow: hidden;
+            position: fixed; width: 100%; /* 防止 iOS 整體過度滾動 */
         }
         
         .app-container { 
             width: 100%; max-width: 500px; 
             height: 100%; 
             display: flex; flex-direction: column; 
-            padding: 20px; 
+            padding: 15px; 
         }
         
         /* 首頁樣式 */
@@ -59,7 +60,6 @@
         .menu-item:active { transform: scale(0.97); }
         .menu-item h3 { margin: 0; font-size: 18px; }
         
-        /* 錯題本按鈕 */
         #mistakeBtn { background: #fff5f5; border: 1px solid #ffcccc; display: none; }
         #mistakeBtn h3 { color: var(--error); }
         .mistake-badge { background: var(--error); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px; margin-left: 10px; }
@@ -77,22 +77,23 @@
         
         /* 情境對話互動 */
         #rolePlayView { display: none; flex-direction: column; height: 100%; }
-        .chat-header { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 15px; color: var(--primary); flex-shrink: 0; }
-        .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding: 10px; margin-bottom: 15px; }
+        .chat-header { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--primary); flex-shrink: 0; }
+        .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding: 10px; margin-bottom: 10px; }
         .bubble { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 16px; line-height: 1.4; position: relative; }
         .bubble.npc { background: var(--chat-npc); color: #333; align-self: flex-start; border-bottom-left-radius: 4px; }
         .bubble.npc .hint { font-size: 12px; color: #666; margin-top: 4px; border-top: 1px solid #ddd; padding-top: 4px; }
         .bubble.player { background: var(--chat-user); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         
-        .task-card { background: #eef2f7; padding: 15px; border-radius: 15px; text-align: center; flex-shrink: 0; margin-bottom: 10px; border: 2px solid var(--primary); }
+        /* 原本的頂部任務卡片（若被鍵盤擠上去也沒關係了） */
+        .task-card { background: #eef2f7; padding: 12px; border-radius: 12px; text-align: center; flex-shrink: 0; margin-bottom: 10px; border: 2px solid var(--primary); }
         .task-label { font-size: 13px; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
-        .task-content { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 10px;}
-        .task-korean-hint { font-size: 24px; font-weight: 800; color: var(--primary); display: none; }
+        .task-content { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 5px;}
+        .task-korean-hint { font-size: 22px; font-weight: 800; color: var(--primary); display: none; }
 
-        .feedback-area { min-height: 50px; margin: 5px 0; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-align: center; }
+        .feedback-area { min-height: 40px; margin: 5px 0; font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-align: center; }
         
-        /* 控制區 (包含錄音按鈕與拼字輸入框) */
-        .controls { padding-bottom: 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        /* 控制區 */
+        .controls { padding-bottom: 15px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
         
         /* 錄音按鈕 */
         .mic-btn-container { position: relative; display: flex; justify-content: center; height: 90px; margin-bottom: 10px; width: 100%; }
@@ -100,16 +101,21 @@
         .mic-btn.recording { background: var(--error); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(235, 77, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0); } }
 
-        /* 拼字輸入區 */
-        .spelling-container { display: none; width: 100%; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .spelling-input { width: 90%; max-width: 350px; padding: 15px; border-radius: 12px; border: 2px solid var(--primary); font-size: 18px; text-align: center; font-family: 'Pretendard', sans-serif; outline: none; }
+        /* 拼字輸入區 (優化：加上專屬提示與更緊湊的版面) */
+        .spelling-container { 
+            display: none; width: 100%; flex-direction: column; align-items: center; gap: 8px; 
+            margin-bottom: 5px; padding: 12px; border-radius: 15px; background: white; 
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05); border: 1px solid #e1e8ed;
+        }
+        .spelling-hint { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 2px; text-align: center; }
+        .spelling-input { width: 100%; max-width: 350px; padding: 12px; border-radius: 10px; border: 2px solid var(--primary); font-size: 16px; text-align: center; font-family: 'Pretendard', sans-serif; outline: none; }
         .spelling-input:focus { box-shadow: 0 0 8px rgba(74, 144, 226, 0.3); }
 
-        .action-btn { background: var(--text); color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: 600; display: none; width: 80%; max-width: 250px; cursor: pointer; }
-        .action-btn.submit-btn { display: inline-block; background: var(--primary); width: 90%; max-width: 350px; border-radius: 12px; }
+        .action-btn { background: var(--text); color: white; border: none; padding: 12px 40px; border-radius: 25px; font-size: 16px; font-weight: 600; display: none; width: 80%; max-width: 250px; cursor: pointer; }
+        .action-btn.submit-btn { display: inline-block; background: var(--primary); width: 100%; max-width: 350px; border-radius: 10px; }
         
         .play-btn { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 15px; margin-top: 10px; cursor: pointer; display: none; font-size: 14px; font-weight: 600; margin-left: auto; margin-right: auto; }
-        .back-home { margin-top: 20px; background: none; border: none; color: #b2bec3; cursor: pointer; text-decoration: underline; font-size: 14px; }
+        .back-home { margin-top: 15px; background: none; border: none; color: #b2bec3; cursor: pointer; text-decoration: underline; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -161,7 +167,8 @@
                 <button class="mic-btn" id="quizMicBtn">🎤</button>
             </div>
             <div class="spelling-container" id="quizSpellContainer">
-                <input type="text" id="quizSpellInput" class="spelling-input" placeholder="請輸入韓文答案..." autocomplete="off">
+                <div class="spelling-hint" id="quizSpellHint">✏️ 準備中...</div>
+                <input type="text" id="quizSpellInput" class="spelling-input" placeholder="請輸入韓文..." autocomplete="off">
                 <button class="action-btn submit-btn" onclick="checkSpelling('quiz')">送出答案</button>
             </div>
 
@@ -185,7 +192,7 @@
             <div class="task-label">📍 輪到你說：</div>
             <div class="task-content" id="rpTaskHint">準備中...</div>
             <div class="task-korean-hint" id="rpTaskKorean">답변</div>
-            <button id="rpRepeatBtn" class="play-btn" style="margin-top: 10px;" onclick="playRpAudio()">🔊 聽正確讀音</button>
+            <button id="rpRepeatBtn" class="play-btn" style="margin-top: 5px;" onclick="playRpAudio()">🔊 聽正確讀音</button>
         </div>
 
         <div class="chat-box" id="chatBox"></div>
@@ -196,6 +203,7 @@
                 <button class="mic-btn" id="rpMicBtn">🎤</button>
             </div>
             <div class="spelling-container" id="rpSpellContainer">
+                <div class="spelling-hint" id="rpSpellHint">✏️ 準備中...</div>
                 <input type="text" id="rpSpellInput" class="spelling-input" placeholder="請輸入對話回覆..." autocomplete="off">
                 <button class="action-btn submit-btn" onclick="checkSpelling('roleplay')">送出對話</button>
             </div>
@@ -210,7 +218,6 @@
 <script>
     // --- 擴充題庫 ---
     const allData = [
-        // 既有內容...
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
         { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更)" },
         { cat: "詞彙", ko: "퇴근", en: "下班 (今日工作結束)" },
@@ -243,7 +250,7 @@
         { cat: "句型", ko: "제가 필요 없는 것을 다 팔았어요", en: "我把不需要的東西都賣掉了" },
         { cat: "句型", ko: "처음으로 한국어로 대화해서 긴장했어요", en: "因為是第一次用韓文對話，所以很緊張。" },
         { cat: "句型", ko: "매일 30분 정도 운동하는 습관을 가지고 싶어요", en: "我想養成每天運動30分鐘左右的習慣。" },
-        { cat: "句型", ko: "운동을 한 후에 에너지가 더 좋아졌어요", en: "運動之後，精神變得更好了。" }
+        { cat: "句型", ko: "운동을 한 후에 에너지가 더 좋아졌어요", en: "운동을 한 후에 정신이 더 좋아졌어요" }
     ];
 
     const scenarios = [
@@ -267,10 +274,9 @@
                 { npcKo: "뿌듯하죠? 다음에 또 연습해요!", npcZh: "很有成就感吧？下次再一起練習！", userTaskZh: "好，我會堅持準備的。", userKo: "네 꾸준히 준비할게요" }
             ]
         },
-        // --- ★ 新增：離職與搬家情境劇本 ★ ---
         {
             id: "moving_prep",
-            title: "📦 離職與搬家前夕的閒聊",
+            title: "📦 離職與搬家前夕",
             desc: "和朋友聊聊最近的忙碌狀態與未來的計畫",
             lines: [
                 { npcKo: "요즘 많이 바쁘죠? 짐 싸기는 다 끝냈어요?", npcZh: "最近很忙吧？行李都打包完了嗎？", userTaskZh: "因為是離職前夕，所以有點忙。", userKo: "퇴사 직전이라서 조금 바빠요" },
@@ -308,7 +314,7 @@
         }
     }
 
-    // 更新介面輸入方式 (口說 vs 拼字)
+    // 更新介面輸入方式
     function setupInputUI(viewPrefix) {
         const micContainer = document.getElementById(`${viewPrefix}MicContainer`);
         const spellContainer = document.getElementById(`${viewPrefix}SpellContainer`);
@@ -324,7 +330,12 @@
             micContainer.style.display = 'none';
             spellContainer.style.display = 'flex';
             spellInput.value = '';
-            setTimeout(() => spellInput.focus(), 100);
+            
+            // 讓焦點進入輸入框，並將輸入框輕微推移至畫面中央，防止 iOS 鍵盤亂跳
+            setTimeout(() => {
+                spellInput.focus();
+                spellInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
         }
     }
 
@@ -399,6 +410,9 @@
         document.getElementById('progressFill').style.width = `${((idx) / currentSet.length) * 100}%`;
         document.getElementById('repeatBtn').style.display = 'none';
         
+        // ★ 同步更新防遮擋的提示文字 ★
+        document.getElementById('quizSpellHint').innerText = "✏️ 翻譯：" + q.en;
+        
         setupInputUI('quiz');
     }
 
@@ -451,6 +465,9 @@
         document.getElementById('rpFeedback').innerText = "";
         document.getElementById('rpFinishBtn').style.display = 'none';
         
+        // ★ 同步更新防遮擋的提示文字 ★
+        document.getElementById('rpSpellHint').innerText = "✏️ 請回答：" + lineData.userTaskZh;
+
         setupInputUI('rp');
     }
 
