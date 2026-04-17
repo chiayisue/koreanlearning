@@ -70,7 +70,7 @@
         
         .progress-bar { width: 100%; height: 6px; background: #dfe6e9; border-radius: 3px; margin-bottom: 20px; flex-shrink: 0; }
         #progressFill { width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: 0.3s; }
-        .question-card { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 10px; min-height: 0; }
+        .question-card { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 10px; min-height: 0; position: relative; }
         .meaning-text { font-size: 22px; font-weight: 700; color: #2d3436; margin-bottom: 15px; line-height: 1.4; }
         .correct-answer { font-size: 32px; font-weight: 800; color: var(--primary); margin-top: 10px; visibility: hidden; line-height: 1.3; word-break: keep-all; }
         
@@ -81,24 +81,36 @@
         .bubble.npc .hint { font-size: 12px; color: #666; margin-top: 4px; border-top: 1px solid #ddd; padding-top: 4px; }
         .bubble.player { background: var(--chat-user); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         
-        .task-card { background: #eef2f7; padding: 12px; border-radius: 12px; text-align: center; flex-shrink: 0; margin-bottom: 10px; border: 2px solid var(--primary); }
+        .task-card { background: #eef2f7; padding: 12px; border-radius: 12px; text-align: center; flex-shrink: 0; margin-bottom: 10px; border: 2px solid var(--primary); position: relative; }
         .task-label { font-size: 13px; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
         .task-content { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 5px;}
         .task-korean-hint { font-size: 22px; font-weight: 800; color: var(--primary); display: none; }
 
-        /* 回饋區塊調整，讓它能好好顯示換行的錯字標記 */
+        /* 💡 文法提示按鈕與彈出視窗 */
+        .grammar-btn { 
+            background: #fff3cd; color: #856404; border: 1px solid #ffeeba; 
+            padding: 6px 15px; border-radius: 20px; font-size: 14px; font-weight: 700; 
+            cursor: pointer; display: none; margin: 0 auto 15px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; line-height: 1.6; font-size: 16px; color: #333;
+        }
+        .modal-title { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid #eef2f7; padding-bottom: 10px; }
+        .close-modal {
+            position: absolute; top: 20px; right: 20px; background: none; border: none;
+            font-size: 24px; cursor: pointer; color: #999; line-height: 1; padding: 0;
+        }
+
         .feedback-area { min-height: 60px; margin: 10px 0; font-weight: 600; font-size: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; text-align: center; line-height: 1.5; }
         
-        /* 💡 新增：錯字標註專屬樣式 */
         .typo-highlight {
-            color: var(--error);
-            font-weight: 800;
-            background-color: #ffeaea;
-            padding: 0 4px;
-            border-radius: 4px;
-            text-decoration: underline;
-            text-decoration-color: var(--error);
-            margin: 0 1px;
+            color: var(--error); font-weight: 800; background-color: #ffeaea; padding: 0 4px;
+            border-radius: 4px; text-decoration: underline; text-decoration-color: var(--error); margin: 0 1px;
         }
 
         .controls { padding-bottom: 15px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
@@ -125,6 +137,14 @@
     </style>
 </head>
 <body>
+
+<div class="modal-overlay" id="grammarModal">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeGrammarModal()">×</button>
+        <div class="modal-title">📖 文法解析</div>
+        <div id="grammarContent">這裡會顯示文法內容</div>
+    </div>
+</div>
 
 <div class="app-container">
     <div id="homeView">
@@ -163,6 +183,7 @@
         <div class="progress-bar"><div id="progressFill"></div></div>
         <div class="question-card">
             <div id="catTag" style="font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: 600;"></div>
+            <button id="quizGrammarBtn" class="grammar-btn" onclick="openGrammarModal('quiz')">💡 查看文法提示</button>
             <div class="meaning-text" id="targetMeaning">準備好...</div>
             <div class="correct-answer" id="targetKorean"></div>
             <button id="repeatBtn" class="play-btn" onclick="playAudio()">🔊 聆聽標準發音</button>
@@ -194,6 +215,7 @@
         <div class="chat-header" id="rpTitle">情境標題</div>
         
         <div class="task-card">
+            <button id="rpGrammarBtn" class="grammar-btn" onclick="openGrammarModal('roleplay')">💡 查看文法提示</button>
             <div class="task-label">📍 輪到你說：</div>
             <div class="task-content" id="rpTaskHint">準備中...</div>
             <div class="task-korean-hint" id="rpTaskKorean">답변</div>
@@ -220,38 +242,29 @@
 </div>
 
 <script>
+    // --- 擴充題庫：加入 grammarNote 欄位 ---
     const allData = [
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
         { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更)" },
         { cat: "詞彙", ko: "퇴근", en: "下班 (今日工作結束)" },
         { cat: "詞彙", ko: "옮기다", en: "搬移 / 換 (例如：換公司)" },
-        { cat: "詞彙", ko: "최애", en: "最愛 / 偶像" },
-        { cat: "詞彙", ko: "멋있다", en: "帥氣 / 很酷" },
-        { cat: "詞彙", ko: "놀라다", en: "驚訝" },
-        { cat: "詞彙", ko: "뿌듯하다", en: "感到驕傲 / 充滿成就感" },
-        { cat: "詞彙", ko: "꾸준하다", en: "穩定 / 堅持" },
-        { cat: "詞彙", ko: "동작", en: "動作 (Movement)" },
-        { cat: "詞彙", ko: "부드럽다", en: "柔軟的 / 溫和的" },
         
-        { cat: "文法", ko: "퇴직할 때", en: "退休的時候 (動詞無收音 + ㄹ 때)" },
-        { cat: "文法", ko: "직전이라서", en: "因為是前夕 (名詞有收音 + 이라서)" },
-        { cat: "文法", ko: "친구라서", en: "因為是朋友 (名詞無收音 + 라서)" },
-        { cat: "句型", ko: "퇴사 직전이라서 짐 싸느라 바빠요", en: "因為是離職前夕，正忙著打包行李。" },
+        // 帶有文法提示的特訓題
+        { cat: "文法", ko: "퇴직할 때", en: "退休的時候", grammarNote: "<b>-(으)ㄹ 때 (表示「當...的時候」)</b><br><br>• 動詞字幹沒有收音時，接 -ㄹ 때。<br>• 예: 퇴직하 + ㄹ 때 ➔ 퇴직할 때" },
+        { cat: "文法", ko: "직전이라서", en: "因為是前夕", grammarNote: "<b>이다：韓文的「是」<br>(이)라서：接在名詞後面，表示原因或理由。</b><br><br>• 名詞<b>有</b>收音：用 이라서<br>• 예: 직전 (有收音) ➔ 직전이라서" },
+        { cat: "文法", ko: "친구라서", en: "因為是朋友", grammarNote: "<b>이다：韓文的「是」<br>(이)라서：接在名詞後面，表示原因或理由。</b><br><br>• 名詞<b>無</b>收音：用 라서<br>• 예: 친구 (無收音) ➔ 친구라서" },
+        { cat: "句型", ko: "퇴사 직전이라서 조금 바빠요", en: "因為是離職前夕，所以有點忙。", grammarNote: "<b>(이)라서 (因為是...)</b><br>직전 (前夕) 有收音，所以加上 이라서。" },
 
         { cat: "文法", ko: "해야 돼요", en: "必須做 / 應該做" },
         { cat: "文法", ko: "해도 돼요", en: "可以做 / 做...也沒關係" },
         { cat: "文法", ko: "먹는 음식", en: "「正在吃」的食物" },
         { cat: "文法", ko: "먹을 음식", en: "「要吃」的食物" },
-        { cat: "文法", ko: "한국어로", en: "「用」韓文 (表達方式/工具)" },
-        { cat: "文法", ko: "친구에게", en: "「給/對」朋友 (對象)" },
-        { cat: "文法", ko: "들어 줬어요", en: "「幫我」聽 / 傾聽 (為某人做某事)" },
-        { cat: "文法", ko: "느낌이 들었어요", en: "有了...的感覺" },
         { cat: "句型", ko: "곧 퇴사해서 안 바빠요", en: "「因為」很快就要離職了，所以不忙。" },
         { cat: "句型", ko: "다음 달에 뉴욕에 갈 거예요", en: "下個月我要去紐約" },
         { cat: "句型", ko: "제가 필요 없는 것을 다 팔았어요", en: "我把不需要的東西都賣掉了" },
         { cat: "句型", ko: "처음으로 한국어로 대화해서 긴장했어요", en: "因為是第一次用韓文對話，所以很緊張。" },
         { cat: "句型", ko: "매일 30분 정도 운동하는 습관을 가지고 싶어요", en: "我想養成每天運動30分鐘左右的習慣。" },
-        { cat: "句型", ko: "운동을 한 후에 에너지가 더 좋아졌어요", en: "운동을 한 후에 정신이 더 좋아졌어요" }
+        { cat: "句型", ko: "운동을 한 후에 에너지가 더 좋아졌어요", en: "運動之後，精神變得更好了。" }
     ];
 
     const scenarios = [
@@ -266,23 +279,13 @@
             ]
         },
         {
-            id: "language_exchange",
-            title: "🗣️ 第一次用韓文聊天",
-            desc: "與朋友練習第一次用韓文對話",
-            lines: [
-                { npcKo: "요즘 한국어 공부 어때요?", npcZh: "最近韓文念得怎麼樣？", userTaskZh: "因為是第一次用韓文說話，有點緊張。", userKo: "처음으로 한국어로 말해서 조금 긴장했어요" },
-                { npcKo: "괜찮아요! 아주 잘하고 있어요.", npcZh: "沒關係！你做得很好。", userTaskZh: "謝謝你親切地聽我說。", userKo: "친절하게 들어 줘서 고마워요" },
-                { npcKo: "뿌듯하죠? 다음에 또 연습해요!", npcZh: "很有成就感吧？下次再一起練習！", userTaskZh: "好，我會堅持準備的。", userKo: "네 꾸준히 준비할게요" }
-            ]
-        },
-        {
             id: "moving_prep",
             title: "📦 離職與搬家前夕",
             desc: "和朋友聊聊最近的忙碌狀態與未來的計畫",
             lines: [
-                { npcKo: "요즘 많이 바쁘죠? 짐 싸기는 다 끝냈어요?", npcZh: "最近很忙吧？行李都打包完了嗎？", userTaskZh: "因為是離職前夕，所以有點忙。", userKo: "퇴사 직전이라서 조금 바빠요" },
-                { npcKo: "그렇군요. 앞으로 계획이 어떻게 돼요?", npcZh: "原來如此。接下來有什麼計畫呢？", userTaskZh: "父母退休的時候，打算搬回台灣。", userKo: "부모님이 퇴직할 때 대만으로 돌아갈 거예요" },
-                { npcKo: "대만 생활이 정말 기대되겠네요!", npcZh: "一定很期待台灣的生活吧！", userTaskZh: "因為是好久沒回去的家，所以很期待。", userKo: "오랜만의 집이라서 기대돼요" }
+                { npcKo: "요즘 많이 바쁘죠? 짐 싸기는 다 끝냈어요?", npcZh: "最近很忙吧？行李都打包完了嗎？", userTaskZh: "因為是離職前夕，所以有點忙。", userKo: "퇴사 직전이라서 조금 바빠요", grammarNote: "<b>(이)라서 (因為是...)</b><br>직전 (前夕) 有收音，所以加上 이라서。" },
+                { npcKo: "그렇군요. 앞으로 계획이 어떻게 돼요?", npcZh: "原來如此。接下來有什麼計畫呢？", userTaskZh: "父母退休的時候，打算搬回台灣。", userKo: "부모님이 퇴직할 때 대만으로 돌아갈 거예요", grammarNote: "<b>-(으)ㄹ 때 (表示「當...的時候」)</b><br>퇴직하 沒有收音，所以接 ㄹ 때。" },
+                { npcKo: "대만 생활이 정말 기대되겠네요!", npcZh: "一定很期待台灣的生活吧！", userTaskZh: "因為是好久沒回去的家，所以很期待。", userKo: "오랜만의 집이라서 기대돼요", grammarNote: "<b>(이)라서 (因為是...)</b><br>집 (家) 有收音，所以加上 이라서。" }
             ]
         }
     ];
@@ -299,41 +302,50 @@
     recognition.lang = 'ko-KR';
     recognition.continuous = false;
 
-    // --- 🌟 核心新功能：字元差異比對演算法 (LCS Diff) ---
-    // 這個函數會逐字檢查你的輸入與標準答案，並把多打或打錯的字包成帶有紅色標記的 HTML
+    // --- 文法 Modal 控制 ---
+    function openGrammarModal(mode) {
+        let note = "";
+        if (mode === 'quiz') {
+            note = currentSet[idx].grammarNote;
+        } else if (mode === 'roleplay') {
+            note = currentScenario.lines[currentLineIdx].grammarNote;
+        }
+        
+        if (note) {
+            document.getElementById('grammarContent').innerHTML = note;
+            document.getElementById('grammarModal').style.display = 'flex';
+        }
+    }
+
+    function closeGrammarModal() {
+        document.getElementById('grammarModal').style.display = 'none';
+    }
+
+    // 點擊背景關閉 Modal
+    document.getElementById('grammarModal').addEventListener('click', function(e) {
+        if (e.target === this) closeGrammarModal();
+    });
+
+    // --- Diff 演算法 ---
     function generateDiffHtml(inputStr, targetStr) {
         const m = inputStr.length;
         const n = targetStr.length;
         const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
 
-        // 建立比對矩陣
         for (let i = 1; i <= m; i++) {
             for (let j = 1; j <= n; j++) {
-                if (inputStr[i - 1] === targetStr[j - 1]) {
-                    dp[i][j] = dp[i - 1][j - 1] + 1;
-                } else {
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-                }
+                if (inputStr[i - 1] === targetStr[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+                else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
             }
         }
 
-        let i = m, j = n;
-        let diffHtml = "";
-        
-        // 回溯找出差異點
+        let i = m, j = n, diffHtml = "";
         while (i > 0 || j > 0) {
             if (i > 0 && j > 0 && inputStr[i - 1] === targetStr[j - 1]) {
-                // 字元相同
-                diffHtml = inputStr[i - 1] + diffHtml;
-                i--;
-                j--;
-            } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
-                // 標準答案有，但你漏打的字 (略過不顯示，因為上面已經會顯示正確答案)
-                j--;
+                diffHtml = inputStr[i - 1] + diffHtml; i--; j--;
+            } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) { j--;
             } else if (i > 0 && (j === 0 || dp[i][j - 1] < dp[i - 1][j])) {
-                // 你打錯或多打的字 -> 加上專屬紅字底色標籤！
-                diffHtml = `<span class="typo-highlight">${inputStr[i - 1]}</span>` + diffHtml;
-                i--;
+                diffHtml = `<span class="typo-highlight">${inputStr[i - 1]}</span>` + diffHtml; i--;
             }
         }
         return diffHtml;
@@ -344,13 +356,14 @@
         const btn = document.getElementById('modeToggleBtn');
         if (inputMode === 'voice') {
             btn.innerHTML = '🔄 目前模式：🗣️ 口說辨識';
-            btn.style.background = '#eef2f7';
-            btn.style.color = 'var(--primary)';
+            btn.style.background = '#eef2f7'; btn.style.color = 'var(--primary)';
         } else {
             btn.innerHTML = '🔄 目前模式：⌨️ 鍵盤拼字';
-            btn.style.background = 'var(--primary)';
-            btn.style.color = 'white';
+            btn.style.background = 'var(--primary)'; btn.style.color = 'white';
         }
+        
+        if (document.getElementById('quizView').style.display === 'flex') setupInputUI('quiz');
+        else if (document.getElementById('rolePlayView').style.display === 'flex') setupInputUI('rp');
     }
 
     function setupInputUI(viewPrefix) {
@@ -362,81 +375,51 @@
         nextBtn.style.display = 'none';
 
         if (inputMode === 'voice') {
-            micContainer.style.display = 'flex';
-            spellContainer.style.display = 'none';
+            micContainer.style.display = 'flex'; spellContainer.style.display = 'none';
         } else {
-            micContainer.style.display = 'none';
-            spellContainer.style.display = 'flex';
+            micContainer.style.display = 'none'; spellContainer.style.display = 'flex';
             spellInput.value = '';
-            setTimeout(() => {
-                spellInput.focus();
-                spellInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
+            setTimeout(() => { spellInput.focus(); spellInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
         }
     }
 
-    document.getElementById('quizSpellInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkSpelling('quiz');
-    });
-    document.getElementById('rpSpellInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkSpelling('roleplay');
-    });
+    document.getElementById('quizSpellInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') checkSpelling('quiz'); });
+    document.getElementById('rpSpellInput').addEventListener('keypress', function (e) { if (e.key === 'Enter') checkSpelling('roleplay'); });
 
     function playAudio(text) { speak(text || document.getElementById('targetKorean').innerText); }
     function playRpAudio(text) { speak(text || document.getElementById('rpTaskKorean').innerText); }
     function speak(text) {
-        if (!text) return;
-        window.speechSynthesis.cancel(); 
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'ko-KR';
-        utter.rate = 0.85;
+        if (!text) return; window.speechSynthesis.cancel(); 
+        const utter = new SpeechSynthesisUtterance(text); utter.lang = 'ko-KR'; utter.rate = 0.85;
         window.speechSynthesis.speak(utter);
     }
 
-    function hideAllViews() {
-        ['homeView', 'quizView', 'scenarioMenuView', 'rolePlayView'].forEach(id => {
-            document.getElementById(id).style.display = 'none';
-        });
-    }
+    function hideAllViews() { ['homeView', 'quizView', 'scenarioMenuView', 'rolePlayView'].forEach(id => { document.getElementById(id).style.display = 'none'; }); }
 
     function goHome() {
-        hideAllViews();
-        document.getElementById('homeView').style.display = 'block';
+        hideAllViews(); document.getElementById('homeView').style.display = 'block';
         const mistakeBtn = document.getElementById('mistakeBtn');
-        if (mistakeBank.length > 0) {
-            mistakeBtn.style.display = 'flex';
-            document.getElementById('mistakeCount').innerText = mistakeBank.length;
-        } else {
-            mistakeBtn.style.display = 'none';
-        }
+        if (mistakeBank.length > 0) { mistakeBtn.style.display = 'flex'; document.getElementById('mistakeCount').innerText = mistakeBank.length; } 
+        else { mistakeBtn.style.display = 'none'; }
     }
 
     function startQuiz(type) {
         recognitionMode = 'quiz';
         currentSet = (type === '全部') ? [...allData] : allData.filter(q => q.cat === type);
-        currentSet.sort(() => Math.random() - 0.5);
-        idx = 0;
-        hideAllViews();
-        document.getElementById('quizView').style.display = 'flex';
-        showQuizQuestion();
+        currentSet.sort(() => Math.random() - 0.5); idx = 0;
+        hideAllViews(); document.getElementById('quizView').style.display = 'flex'; showQuizQuestion();
     }
 
     function startMistakeQuiz() {
         if (mistakeBank.length === 0) return;
-        recognitionMode = 'quiz';
-        currentSet = [...mistakeBank];
-        currentSet.sort(() => Math.random() - 0.5);
-        idx = 0;
-        mistakeBank = []; 
-        hideAllViews();
-        document.getElementById('quizView').style.display = 'flex';
-        showQuizQuestion();
+        recognitionMode = 'quiz'; currentSet = [...mistakeBank]; currentSet.sort(() => Math.random() - 0.5); idx = 0;
+        mistakeBank = []; hideAllViews(); document.getElementById('quizView').style.display = 'flex'; showQuizQuestion();
     }
 
     function showQuizQuestion() {
         const q = currentSet[idx];
         document.getElementById('catTag').innerText = q.cat;
-        document.getElementById('targetMeaning').innerText = q.en;
+        document.getElementById('targetMeaning').innerText = q.en; 
         document.getElementById('targetKorean').innerText = q.ko;
         document.getElementById('targetKorean').style.visibility = 'hidden';
         document.getElementById('quizFeedback').innerText = "";
@@ -444,49 +427,41 @@
         document.getElementById('repeatBtn').style.display = 'none';
         document.getElementById('quizSpellHint').innerText = "✏️ 翻譯：" + q.en;
         
+        // 判斷是否顯示文法按鈕
+        const grammarBtn = document.getElementById('quizGrammarBtn');
+        if (q.grammarNote) grammarBtn.style.display = 'inline-block';
+        else grammarBtn.style.display = 'none';
+
         setupInputUI('quiz');
     }
 
     function nextQuestion() {
-        idx++;
-        if (idx < currentSet.length) showQuizQuestion();
-        else { alert("太棒了！本階段練習完成！"); goHome(); }
+        idx++; if (idx < currentSet.length) showQuizQuestion(); else { alert("太棒了！本階段練習完成！"); goHome(); }
     }
 
     function showScenarioMenu() {
-        hideAllViews();
-        document.getElementById('scenarioMenuView').style.display = 'flex';
-        const listContainer = document.getElementById('scenarioList');
-        listContainer.innerHTML = '';
+        hideAllViews(); document.getElementById('scenarioMenuView').style.display = 'flex';
+        const listContainer = document.getElementById('scenarioList'); listContainer.innerHTML = '';
         scenarios.forEach((s, index) => {
-            const item = document.createElement('div');
-            item.className = 'menu-item';
-            item.onclick = () => startRolePlay(index);
+            const item = document.createElement('div'); item.className = 'menu-item'; item.onclick = () => startRolePlay(index);
             item.innerHTML = `<div><h3>${s.title}</h3><p style="margin:5px 0 0; font-size:12px; color:#666;">${s.desc}</p></div><span class="icon">💬</span>`;
             listContainer.appendChild(item);
         });
     }
 
     function startRolePlay(scenarioIndex) {
-        recognitionMode = 'roleplay';
-        currentScenario = scenarios[scenarioIndex];
-        currentLineIdx = 0;
-        hideAllViews();
-        document.getElementById('rolePlayView').style.display = 'flex';
-        document.getElementById('rpTitle').innerText = currentScenario.title;
-        document.getElementById('chatBox').innerHTML = ''; 
+        recognitionMode = 'roleplay'; currentScenario = scenarios[scenarioIndex]; currentLineIdx = 0;
+        hideAllViews(); document.getElementById('rolePlayView').style.display = 'flex';
+        document.getElementById('rpTitle').innerText = currentScenario.title; document.getElementById('chatBox').innerHTML = ''; 
         playCurrentNpcLine();
     }
 
     function playCurrentNpcLine() {
         const lineData = currentScenario.lines[currentLineIdx];
         const chatBox = document.getElementById('chatBox');
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble npc';
+        const bubble = document.createElement('div'); bubble.className = 'bubble npc';
         bubble.innerHTML = `${lineData.npcKo}<div class="hint">${lineData.npcZh}</div>`;
-        chatBox.appendChild(bubble);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        speak(lineData.npcKo);
+        chatBox.appendChild(bubble); chatBox.scrollTop = chatBox.scrollHeight; speak(lineData.npcKo);
 
         document.getElementById('rpTaskHint').innerText = lineData.userTaskZh;
         document.getElementById('rpTaskKorean').innerText = lineData.userKo;
@@ -496,19 +471,20 @@
         document.getElementById('rpFinishBtn').style.display = 'none';
         document.getElementById('rpSpellHint').innerText = "✏️ 請回答：" + lineData.userTaskZh;
 
+        // 判斷是否顯示文法按鈕
+        const grammarBtn = document.getElementById('rpGrammarBtn');
+        if (lineData.grammarNote) grammarBtn.style.display = 'inline-block';
+        else grammarBtn.style.display = 'none';
+
         setupInputUI('rp');
     }
 
     function nextRolePlayLine() {
-        currentLineIdx++;
-        if (currentLineIdx < currentScenario.lines.length) playCurrentNpcLine();
+        currentLineIdx++; if (currentLineIdx < currentScenario.lines.length) playCurrentNpcLine();
         else {
             const chatBox = document.getElementById('chatBox');
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble npc';
-            bubble.innerHTML = `🎉 對話完成！做得好！`;
-            chatBox.appendChild(bubble);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            const bubble = document.createElement('div'); bubble.className = 'bubble npc';
+            bubble.innerHTML = `🎉 對話完成！做得好！`; chatBox.appendChild(bubble); chatBox.scrollTop = chatBox.scrollHeight;
             
             document.querySelector('.task-card').style.display = 'none';
             document.getElementById('rpMicContainer').style.display = 'none';
@@ -518,64 +494,40 @@
         }
     }
 
-    // --- 結合 Diff 演算法的驗證邏輯 ---
     function processAnswer(inputRaw, mode) {
         const cleanInput = inputRaw.replace(/[\s.,?!]/g, "");
-        
         if (mode === 'quiz') {
-            const currentQ = currentSet[idx];
-            const targetRaw = currentQ.ko;
-            const targetClean = targetRaw.replace(/[\s.,?!]/g, "");
+            const currentQ = currentSet[idx]; const targetRaw = currentQ.ko; const targetClean = targetRaw.replace(/[\s.,?!]/g, "");
             
             if (cleanInput === targetClean) {
-                document.getElementById('quizFeedback').innerHTML = `✅ 完美！`;
-                document.getElementById('quizFeedback').style.color = 'var(--success)';
+                document.getElementById('quizFeedback').innerHTML = `✅ 完美！`; document.getElementById('quizFeedback').style.color = 'var(--success)';
                 document.getElementById('targetKorean').style.visibility = 'visible';
-                
-                document.getElementById('quizMicContainer').style.display = 'none';
-                document.getElementById('quizSpellContainer').style.display = 'none';
-                document.getElementById('nextQuizBtn').style.display = 'inline-block';
-                document.getElementById('repeatBtn').style.display = 'block';
+                document.getElementById('quizMicContainer').style.display = 'none'; document.getElementById('quizSpellContainer').style.display = 'none';
+                document.getElementById('nextQuizBtn').style.display = 'inline-block'; document.getElementById('repeatBtn').style.display = 'block';
                 document.getElementById('progressFill').style.width = `${((idx + 1) / currentSet.length) * 100}%`;
             } else {
-                // 使用 Diff 演算法標記錯誤
                 const highlightedDiff = generateDiffHtml(inputRaw, targetRaw);
                 document.getElementById('quizFeedback').style.color = '#333';
                 document.getElementById('quizFeedback').innerHTML = `<span style="color:var(--error);">❌ 錯誤，請注意紅字部分：</span><br><div style="font-size:18px; margin-top:8px; font-weight:700; letter-spacing:0.5px;">"${highlightedDiff}"</div>`;
-                
-                document.getElementById('targetKorean').style.visibility = 'visible'; 
-                document.getElementById('repeatBtn').style.display = 'block';
-                playAudio(targetRaw);
-                if (!mistakeBank.some(item => item.ko === currentQ.ko)) mistakeBank.push(currentQ);
+                document.getElementById('targetKorean').style.visibility = 'visible'; document.getElementById('repeatBtn').style.display = 'block';
+                playAudio(targetRaw); if (!mistakeBank.some(item => item.ko === currentQ.ko)) mistakeBank.push(currentQ);
             }
         } 
         else if (mode === 'roleplay') {
-            const targetRaw = currentScenario.lines[currentLineIdx].userKo;
-            const targetClean = targetRaw.replace(/[\s.,?!]/g, "");
+            const targetRaw = currentScenario.lines[currentLineIdx].userKo; const targetClean = targetRaw.replace(/[\s.,?!]/g, "");
             
             if (cleanInput === targetClean) {
-                document.getElementById('rpFeedback').innerHTML = "✅ 回覆成功！";
-                document.getElementById('rpFeedback').style.color = 'var(--success)';
+                document.getElementById('rpFeedback').innerHTML = "✅ 回覆成功！"; document.getElementById('rpFeedback').style.color = 'var(--success)';
                 document.getElementById('rpTaskKorean').style.display = 'block';
-                
-                const chatBox = document.getElementById('chatBox');
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble player';
-                bubble.innerText = inputRaw;
-                chatBox.appendChild(bubble);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                
-                document.getElementById('rpMicContainer').style.display = 'none';
-                document.getElementById('rpSpellContainer').style.display = 'none';
+                const chatBox = document.getElementById('chatBox'); const bubble = document.createElement('div');
+                bubble.className = 'bubble player'; bubble.innerText = inputRaw; chatBox.appendChild(bubble); chatBox.scrollTop = chatBox.scrollHeight;
+                document.getElementById('rpMicContainer').style.display = 'none'; document.getElementById('rpSpellContainer').style.display = 'none';
                 document.getElementById('rpNextBtn').style.display = 'inline-block';
             } else {
-                // 使用 Diff 演算法標記錯誤
                 const highlightedDiff = generateDiffHtml(inputRaw, targetRaw);
                 document.getElementById('rpFeedback').style.color = '#333';
                 document.getElementById('rpFeedback').innerHTML = `<span style="color:var(--error);">❌ 錯誤，請注意紅字部分：</span><br><div style="font-size:18px; margin-top:8px; font-weight:700; letter-spacing:0.5px;">"${highlightedDiff}"</div>`;
-                
-                document.getElementById('rpTaskKorean').style.display = 'block'; 
-                document.getElementById('rpRepeatBtn').style.display = 'inline-block';
+                document.getElementById('rpTaskKorean').style.display = 'block'; document.getElementById('rpRepeatBtn').style.display = 'inline-block';
                 playRpAudio(targetRaw); 
             }
         }
@@ -583,9 +535,7 @@
 
     function checkSpelling(mode) {
         const inputEl = mode === 'quiz' ? document.getElementById('quizSpellInput') : document.getElementById('rpSpellInput');
-        const answer = inputEl.value.trim();
-        if (!answer) return;
-        processAnswer(answer, mode);
+        const answer = inputEl.value.trim(); if (!answer) return; processAnswer(answer, mode);
     }
 
     document.getElementById('quizMicBtn').addEventListener('click', startListening);
@@ -593,25 +543,21 @@
 
     function startListening(e) {
         try {
-            recognition.start();
-            e.target.classList.add('recording');
+            recognition.start(); e.target.classList.add('recording');
             const feedbackEl = recognitionMode === 'quiz' ? document.getElementById('quizFeedback') : document.getElementById('rpFeedback');
-            feedbackEl.innerHTML = "正在聆聽...";
-            feedbackEl.style.color = 'var(--text)';
+            feedbackEl.innerHTML = "正在聆聽..."; feedbackEl.style.color = 'var(--text)';
         } catch (err) { console.log("語音辨識運行中"); }
     }
 
     recognition.onresult = (event) => {
         const result = event.results[0][0].transcript.trim();
-        document.querySelectorAll('.mic-btn').forEach(btn => btn.classList.remove('recording'));
-        processAnswer(result, recognitionMode);
+        document.querySelectorAll('.mic-btn').forEach(btn => btn.classList.remove('recording')); processAnswer(result, recognitionMode);
     };
 
     recognition.onerror = () => {
         document.querySelectorAll('.mic-btn').forEach(btn => btn.classList.remove('recording'));
         const feedbackEl = recognitionMode === 'quiz' ? document.getElementById('quizFeedback') : document.getElementById('rpFeedback');
-        feedbackEl.innerHTML = "沒聽清楚，請重試。";
-        feedbackEl.style.color = 'var(--error)';
+        feedbackEl.innerHTML = "沒聽清楚，請重試。"; feedbackEl.style.color = 'var(--error)';
     };
 </script>
 </body>
