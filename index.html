@@ -208,8 +208,9 @@
 </div>
 
 <script>
-    // --- 擴充題庫 (包含 0415 及 image_84c883 最新筆記) ---
+    // --- 擴充題庫 ---
     const allData = [
+        // 既有內容...
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
         { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更)" },
         { cat: "詞彙", ko: "퇴근", en: "下班 (今日工作結束)" },
@@ -221,6 +222,14 @@
         { cat: "詞彙", ko: "꾸준하다", en: "穩定 / 堅持" },
         { cat: "詞彙", ko: "동작", en: "動作 (Movement)" },
         { cat: "詞彙", ko: "부드럽다", en: "柔軟的 / 溫和的" },
+        
+        // --- ★ 新增：收音與文法變化特訓 ★ ---
+        { cat: "文法", ko: "퇴직할 때", en: "退休的時候 (動詞無收音 + ㄹ 때)" },
+        { cat: "文法", ko: "직전이라서", en: "因為是前夕 (名詞有收音 + 이라서)" },
+        { cat: "文法", ko: "친구라서", en: "因為是朋友 (名詞無收音 + 라서)" },
+        { cat: "句型", ko: "퇴사 직전이라서 짐 싸느라 바빠요", en: "因為是離職前夕，正忙著打包行李。" },
+
+        // 其他文法與句型...
         { cat: "文法", ko: "해야 돼요", en: "必須做 / 應該做" },
         { cat: "文法", ko: "해도 돼요", en: "可以做 / 做...也沒關係" },
         { cat: "文法", ko: "먹는 음식", en: "「正在吃」的食物" },
@@ -256,6 +265,17 @@
                 { npcKo: "요즘 한국어 공부 어때요?", npcZh: "最近韓文念得怎麼樣？", userTaskZh: "因為是第一次用韓文說話，有點緊張。", userKo: "처음으로 한국어로 말해서 조금 긴장했어요" },
                 { npcKo: "괜찮아요! 아주 잘하고 있어요.", npcZh: "沒關係！你做得很好。", userTaskZh: "謝謝你親切地聽我說。", userKo: "친절하게 들어 줘서 고마워요" },
                 { npcKo: "뿌듯하죠? 다음에 또 연습해요!", npcZh: "很有成就感吧？下次再一起練習！", userTaskZh: "好，我會堅持準備的。", userKo: "네 꾸준히 준비할게요" }
+            ]
+        },
+        // --- ★ 新增：離職與搬家情境劇本 ★ ---
+        {
+            id: "moving_prep",
+            title: "📦 離職與搬家前夕的閒聊",
+            desc: "和朋友聊聊最近的忙碌狀態與未來的計畫",
+            lines: [
+                { npcKo: "요즘 많이 바쁘죠? 짐 싸기는 다 끝냈어요?", npcZh: "最近很忙吧？行李都打包完了嗎？", userTaskZh: "因為是離職前夕，所以有點忙。", userKo: "퇴사 직전이라서 조금 바빠요" },
+                { npcKo: "그렇군요. 앞으로 계획이 어떻게 돼요?", npcZh: "原來如此。接下來有什麼計畫呢？", userTaskZh: "父母退休的時候，打算搬回台灣。", userKo: "부모님이 퇴직할 때 대만으로 돌아갈 거예요" },
+                { npcKo: "대만 생활이 정말 기대되겠네요!", npcZh: "一定很期待台灣的生活吧！", userTaskZh: "因為是好久沒回去的家，所以很期待。", userKo: "오랜만의 집이라서 기대돼요" }
             ]
         }
     ];
@@ -295,7 +315,6 @@
         const spellInput = document.getElementById(`${viewPrefix}SpellInput`);
         const nextBtn = document.getElementById(`${viewPrefix === 'quiz' ? 'nextQuizBtn' : 'rpNextBtn'}`);
         
-        // 隱藏下一題按鈕
         nextBtn.style.display = 'none';
 
         if (inputMode === 'voice') {
@@ -305,12 +324,10 @@
             micContainer.style.display = 'none';
             spellContainer.style.display = 'flex';
             spellInput.value = '';
-            // 給予小延遲讓畫面渲染後再 focus
             setTimeout(() => spellInput.focus(), 100);
         }
     }
 
-    // 綁定 Enter 鍵送出
     document.getElementById('quizSpellInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') checkSpelling('quiz');
     });
@@ -456,7 +473,7 @@
         }
     }
 
-    // --- 驗證與比對邏輯 (共用核心) ---
+    // --- 驗證與比對邏輯 ---
     function processAnswer(inputRaw, mode) {
         const cleanInput = inputRaw.replace(/[\s.,?!]/g, "");
         
@@ -512,7 +529,6 @@
         }
     }
 
-    // 處理拼字送出
     function checkSpelling(mode) {
         const inputEl = mode === 'quiz' ? document.getElementById('quizSpellInput') : document.getElementById('rpSpellInput');
         const answer = inputEl.value.trim();
@@ -520,7 +536,6 @@
         processAnswer(answer, mode);
     }
 
-    // 處理語音送出
     document.getElementById('quizMicBtn').addEventListener('click', startListening);
     document.getElementById('rpMicBtn').addEventListener('click', startListening);
 
