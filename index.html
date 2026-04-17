@@ -26,7 +26,7 @@
             margin: 0; padding: 0; 
             display: flex; justify-content: center;
             height: 100dvh; overflow: hidden;
-            position: fixed; width: 100%; /* 防止 iOS 整體過度滾動 */
+            position: fixed; width: 100%;
         }
         
         .app-container { 
@@ -42,7 +42,6 @@
         .header h1 { font-size: 28px; margin: 0; color: var(--primary); }
         .header p { color: #636e72; margin: 5px 0 0; }
         
-        /* 模式切換按鈕 */
         .mode-toggle-btn {
             width: 100%; background: #eef2f7; color: var(--primary); border: 2px solid var(--primary);
             padding: 12px; border-radius: 15px; font-size: 16px; font-weight: 700;
@@ -64,19 +63,17 @@
         #mistakeBtn h3 { color: var(--error); }
         .mistake-badge { background: var(--error); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px; margin-left: 10px; }
 
-        /* 一般測驗頁面 */
-        #quizView { display: none; flex-direction: column; height: 100%; text-align: center; }
+        /* 測驗與情境介面 */
+        #quizView, #scenarioMenuView, #rolePlayView { display: none; flex-direction: column; height: 100%; }
+        #quizView { text-align: center; }
+        #scenarioMenuView { padding-top: 20px; }
+        
         .progress-bar { width: 100%; height: 6px; background: #dfe6e9; border-radius: 3px; margin-bottom: 20px; flex-shrink: 0; }
         #progressFill { width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: 0.3s; }
         .question-card { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 10px; min-height: 0; }
         .meaning-text { font-size: 22px; font-weight: 700; color: #2d3436; margin-bottom: 15px; line-height: 1.4; }
         .correct-answer { font-size: 32px; font-weight: 800; color: var(--primary); margin-top: 10px; visibility: hidden; line-height: 1.3; word-break: keep-all; }
         
-        /* 情境對話選單 */
-        #scenarioMenuView { display: none; flex-direction: column; height: 100%; padding-top: 20px; }
-        
-        /* 情境對話互動 */
-        #rolePlayView { display: none; flex-direction: column; height: 100%; }
         .chat-header { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--primary); flex-shrink: 0; }
         .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding: 10px; margin-bottom: 10px; }
         .bubble { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 16px; line-height: 1.4; position: relative; }
@@ -84,24 +81,33 @@
         .bubble.npc .hint { font-size: 12px; color: #666; margin-top: 4px; border-top: 1px solid #ddd; padding-top: 4px; }
         .bubble.player { background: var(--chat-user); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         
-        /* 原本的頂部任務卡片（若被鍵盤擠上去也沒關係了） */
         .task-card { background: #eef2f7; padding: 12px; border-radius: 12px; text-align: center; flex-shrink: 0; margin-bottom: 10px; border: 2px solid var(--primary); }
         .task-label { font-size: 13px; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
         .task-content { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 5px;}
         .task-korean-hint { font-size: 22px; font-weight: 800; color: var(--primary); display: none; }
 
-        .feedback-area { min-height: 40px; margin: 5px 0; font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-align: center; }
+        /* 回饋區塊調整，讓它能好好顯示換行的錯字標記 */
+        .feedback-area { min-height: 60px; margin: 10px 0; font-weight: 600; font-size: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; text-align: center; line-height: 1.5; }
         
-        /* 控制區 */
+        /* 💡 新增：錯字標註專屬樣式 */
+        .typo-highlight {
+            color: var(--error);
+            font-weight: 800;
+            background-color: #ffeaea;
+            padding: 0 4px;
+            border-radius: 4px;
+            text-decoration: underline;
+            text-decoration-color: var(--error);
+            margin: 0 1px;
+        }
+
         .controls { padding-bottom: 15px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
         
-        /* 錄音按鈕 */
         .mic-btn-container { position: relative; display: flex; justify-content: center; height: 90px; margin-bottom: 10px; width: 100%; }
         .mic-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: none; color: white; font-size: 28px; cursor: pointer; box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4); transition: background-color 0.3s; }
         .mic-btn.recording { background: var(--error); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(235, 77, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(235, 77, 75, 0); } }
 
-        /* 拼字輸入區 (優化：加上專屬提示與更緊湊的版面) */
         .spelling-container { 
             display: none; width: 100%; flex-direction: column; align-items: center; gap: 8px; 
             margin-bottom: 5px; padding: 12px; border-radius: 15px; background: white; 
@@ -171,7 +177,6 @@
                 <input type="text" id="quizSpellInput" class="spelling-input" placeholder="請輸入韓文..." autocomplete="off">
                 <button class="action-btn submit-btn" onclick="checkSpelling('quiz')">送出答案</button>
             </div>
-
             <button class="action-btn" id="nextQuizBtn" onclick="nextQuestion()">下一題 ➔</button>
             <button class="back-home" onclick="goHome()">回首頁</button>
         </div>
@@ -207,7 +212,6 @@
                 <input type="text" id="rpSpellInput" class="spelling-input" placeholder="請輸入對話回覆..." autocomplete="off">
                 <button class="action-btn submit-btn" onclick="checkSpelling('roleplay')">送出對話</button>
             </div>
-
             <button class="action-btn" id="rpNextBtn" onclick="nextRolePlayLine()">繼續對話 ➔</button>
             <button class="action-btn" id="rpFinishBtn" onclick="goHome()">完成對話 🏠</button>
             <button class="back-home" onclick="goHome()">結束並回首頁</button>
@@ -216,7 +220,6 @@
 </div>
 
 <script>
-    // --- 擴充題庫 ---
     const allData = [
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
         { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更)" },
@@ -230,13 +233,11 @@
         { cat: "詞彙", ko: "동작", en: "動作 (Movement)" },
         { cat: "詞彙", ko: "부드럽다", en: "柔軟的 / 溫和的" },
         
-        // --- ★ 新增：收音與文法變化特訓 ★ ---
         { cat: "文法", ko: "퇴직할 때", en: "退休的時候 (動詞無收音 + ㄹ 때)" },
         { cat: "文法", ko: "직전이라서", en: "因為是前夕 (名詞有收音 + 이라서)" },
         { cat: "文法", ko: "친구라서", en: "因為是朋友 (名詞無收音 + 라서)" },
         { cat: "句型", ko: "퇴사 직전이라서 짐 싸느라 바빠요", en: "因為是離職前夕，正忙著打包行李。" },
 
-        // 其他文法與句型...
         { cat: "文法", ko: "해야 돼요", en: "必須做 / 應該做" },
         { cat: "文法", ko: "해도 돼요", en: "可以做 / 做...也沒關係" },
         { cat: "文法", ko: "먹는 음식", en: "「正在吃」的食物" },
@@ -286,20 +287,58 @@
         }
     ];
 
-    // --- 全域狀態 ---
     let currentSet = [];
     let idx = 0;
     let mistakeBank = [];
     let currentScenario = null;
     let currentLineIdx = 0;
     let recognitionMode = 'quiz';
-    let inputMode = 'voice'; // 'voice' or 'spelling'
+    let inputMode = 'voice';
 
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ko-KR';
     recognition.continuous = false;
 
-    // --- 模式切換邏輯 ---
+    // --- 🌟 核心新功能：字元差異比對演算法 (LCS Diff) ---
+    // 這個函數會逐字檢查你的輸入與標準答案，並把多打或打錯的字包成帶有紅色標記的 HTML
+    function generateDiffHtml(inputStr, targetStr) {
+        const m = inputStr.length;
+        const n = targetStr.length;
+        const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+        // 建立比對矩陣
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                if (inputStr[i - 1] === targetStr[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+
+        let i = m, j = n;
+        let diffHtml = "";
+        
+        // 回溯找出差異點
+        while (i > 0 || j > 0) {
+            if (i > 0 && j > 0 && inputStr[i - 1] === targetStr[j - 1]) {
+                // 字元相同
+                diffHtml = inputStr[i - 1] + diffHtml;
+                i--;
+                j--;
+            } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+                // 標準答案有，但你漏打的字 (略過不顯示，因為上面已經會顯示正確答案)
+                j--;
+            } else if (i > 0 && (j === 0 || dp[i][j - 1] < dp[i - 1][j])) {
+                // 你打錯或多打的字 -> 加上專屬紅字底色標籤！
+                diffHtml = `<span class="typo-highlight">${inputStr[i - 1]}</span>` + diffHtml;
+                i--;
+            }
+        }
+        return diffHtml;
+    }
+
     function toggleInputMode() {
         inputMode = inputMode === 'voice' ? 'spelling' : 'voice';
         const btn = document.getElementById('modeToggleBtn');
@@ -314,7 +353,6 @@
         }
     }
 
-    // 更新介面輸入方式
     function setupInputUI(viewPrefix) {
         const micContainer = document.getElementById(`${viewPrefix}MicContainer`);
         const spellContainer = document.getElementById(`${viewPrefix}SpellContainer`);
@@ -330,8 +368,6 @@
             micContainer.style.display = 'none';
             spellContainer.style.display = 'flex';
             spellInput.value = '';
-            
-            // 讓焦點進入輸入框，並將輸入框輕微推移至畫面中央，防止 iOS 鍵盤亂跳
             setTimeout(() => {
                 spellInput.focus();
                 spellInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -346,7 +382,6 @@
         if (e.key === 'Enter') checkSpelling('roleplay');
     });
 
-    // --- 音訊 ---
     function playAudio(text) { speak(text || document.getElementById('targetKorean').innerText); }
     function playRpAudio(text) { speak(text || document.getElementById('rpTaskKorean').innerText); }
     function speak(text) {
@@ -358,7 +393,6 @@
         window.speechSynthesis.speak(utter);
     }
 
-    // --- 畫面導航 ---
     function hideAllViews() {
         ['homeView', 'quizView', 'scenarioMenuView', 'rolePlayView'].forEach(id => {
             document.getElementById(id).style.display = 'none';
@@ -377,7 +411,6 @@
         }
     }
 
-    // --- 測驗模式 ---
     function startQuiz(type) {
         recognitionMode = 'quiz';
         currentSet = (type === '全部') ? [...allData] : allData.filter(q => q.cat === type);
@@ -409,8 +442,6 @@
         document.getElementById('quizFeedback').innerText = "";
         document.getElementById('progressFill').style.width = `${((idx) / currentSet.length) * 100}%`;
         document.getElementById('repeatBtn').style.display = 'none';
-        
-        // ★ 同步更新防遮擋的提示文字 ★
         document.getElementById('quizSpellHint').innerText = "✏️ 翻譯：" + q.en;
         
         setupInputUI('quiz');
@@ -422,7 +453,6 @@
         else { alert("太棒了！本階段練習完成！"); goHome(); }
     }
 
-    // --- 情境對話模式 ---
     function showScenarioMenu() {
         hideAllViews();
         document.getElementById('scenarioMenuView').style.display = 'flex';
@@ -464,8 +494,6 @@
         document.getElementById('rpRepeatBtn').style.display = 'none';
         document.getElementById('rpFeedback').innerText = "";
         document.getElementById('rpFinishBtn').style.display = 'none';
-        
-        // ★ 同步更新防遮擋的提示文字 ★
         document.getElementById('rpSpellHint').innerText = "✏️ 請回答：" + lineData.userTaskZh;
 
         setupInputUI('rp');
@@ -490,15 +518,16 @@
         }
     }
 
-    // --- 驗證與比對邏輯 ---
+    // --- 結合 Diff 演算法的驗證邏輯 ---
     function processAnswer(inputRaw, mode) {
         const cleanInput = inputRaw.replace(/[\s.,?!]/g, "");
         
         if (mode === 'quiz') {
             const currentQ = currentSet[idx];
-            const target = currentQ.ko.replace(/[\s.,?!]/g, "");
+            const targetRaw = currentQ.ko;
+            const targetClean = targetRaw.replace(/[\s.,?!]/g, "");
             
-            if (cleanInput === target) {
+            if (cleanInput === targetClean) {
                 document.getElementById('quizFeedback').innerHTML = `✅ 完美！`;
                 document.getElementById('quizFeedback').style.color = 'var(--success)';
                 document.getElementById('targetKorean').style.visibility = 'visible';
@@ -509,20 +538,23 @@
                 document.getElementById('repeatBtn').style.display = 'block';
                 document.getElementById('progressFill').style.width = `${((idx + 1) / currentSet.length) * 100}%`;
             } else {
-                document.getElementById('quizFeedback').innerText = `❌ 錯誤：你輸入/說了 "${inputRaw}"`;
-                document.getElementById('quizFeedback').style.color = 'var(--error)';
+                // 使用 Diff 演算法標記錯誤
+                const highlightedDiff = generateDiffHtml(inputRaw, targetRaw);
+                document.getElementById('quizFeedback').style.color = '#333';
+                document.getElementById('quizFeedback').innerHTML = `<span style="color:var(--error);">❌ 錯誤，請注意紅字部分：</span><br><div style="font-size:18px; margin-top:8px; font-weight:700; letter-spacing:0.5px;">"${highlightedDiff}"</div>`;
+                
                 document.getElementById('targetKorean').style.visibility = 'visible'; 
                 document.getElementById('repeatBtn').style.display = 'block';
-                playAudio(currentQ.ko);
+                playAudio(targetRaw);
                 if (!mistakeBank.some(item => item.ko === currentQ.ko)) mistakeBank.push(currentQ);
             }
         } 
         else if (mode === 'roleplay') {
-            const targetKo = currentScenario.lines[currentLineIdx].userKo;
-            const targetClean = targetKo.replace(/[\s.,?!]/g, "");
+            const targetRaw = currentScenario.lines[currentLineIdx].userKo;
+            const targetClean = targetRaw.replace(/[\s.,?!]/g, "");
             
             if (cleanInput === targetClean) {
-                document.getElementById('rpFeedback').innerText = "✅ 回覆成功！";
+                document.getElementById('rpFeedback').innerHTML = "✅ 回覆成功！";
                 document.getElementById('rpFeedback').style.color = 'var(--success)';
                 document.getElementById('rpTaskKorean').style.display = 'block';
                 
@@ -537,11 +569,14 @@
                 document.getElementById('rpSpellContainer').style.display = 'none';
                 document.getElementById('rpNextBtn').style.display = 'inline-block';
             } else {
-                document.getElementById('rpFeedback').innerText = `❌ 錯誤：你輸入/說了 "${inputRaw}"`;
-                document.getElementById('rpFeedback').style.color = 'var(--error)';
+                // 使用 Diff 演算法標記錯誤
+                const highlightedDiff = generateDiffHtml(inputRaw, targetRaw);
+                document.getElementById('rpFeedback').style.color = '#333';
+                document.getElementById('rpFeedback').innerHTML = `<span style="color:var(--error);">❌ 錯誤，請注意紅字部分：</span><br><div style="font-size:18px; margin-top:8px; font-weight:700; letter-spacing:0.5px;">"${highlightedDiff}"</div>`;
+                
                 document.getElementById('rpTaskKorean').style.display = 'block'; 
                 document.getElementById('rpRepeatBtn').style.display = 'inline-block';
-                playRpAudio(targetKo); 
+                playRpAudio(targetRaw); 
             }
         }
     }
@@ -561,7 +596,8 @@
             recognition.start();
             e.target.classList.add('recording');
             const feedbackEl = recognitionMode === 'quiz' ? document.getElementById('quizFeedback') : document.getElementById('rpFeedback');
-            feedbackEl.innerText = "正在聆聽...";
+            feedbackEl.innerHTML = "正在聆聽...";
+            feedbackEl.style.color = 'var(--text)';
         } catch (err) { console.log("語音辨識運行中"); }
     }
 
@@ -574,7 +610,8 @@
     recognition.onerror = () => {
         document.querySelectorAll('.mic-btn').forEach(btn => btn.classList.remove('recording'));
         const feedbackEl = recognitionMode === 'quiz' ? document.getElementById('quizFeedback') : document.getElementById('rpFeedback');
-        feedbackEl.innerText = "沒聽清楚，請重試。";
+        feedbackEl.innerHTML = "沒聽清楚，請重試。";
+        feedbackEl.style.color = 'var(--error)';
     };
 </script>
 </body>
