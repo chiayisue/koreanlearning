@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Bon Voyage</title>
+    <title>Sue's Korean Hub</title>
     <style>
         :root {
             --primary: #4a90e2;
@@ -36,12 +36,11 @@
             padding: 15px; 
         }
         
-        /* 首頁樣式 */
+        /* 首頁樣式還原 */
         #homeView { flex: 1; overflow-y: auto; padding-top: 10px; padding-bottom: 20px; }
-        .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .logo { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
-        .header-text h1 { font-size: 26px; margin: 0; color: var(--primary); }
-        .header-text p { color: #636e72; margin: 2px 0 0; font-size: 14px; }
+        .header { text-align: left; margin-bottom: 20px; }
+        .header h1 { font-size: 28px; margin: 0; color: var(--primary); }
+        .header p { color: #636e72; margin: 5px 0 0; }
         
         .mode-toggle-btn {
             width: 100%; background: #eef2f7; color: var(--primary); border: 2px solid var(--primary);
@@ -122,11 +121,8 @@
 <div class="app-container">
     <div id="homeView">
         <div class="header">
-            <img src="https://i.imgur.com/rRmXupF.jpeg" alt="Logo" class="logo">
-            <div class="header-text">
-                <h1>Bon Voyage</h1>
-                <p>韓文口說與日常練習</p>
-            </div>
+            <h1>Sue 的韓文學習中心</h1>
+            <p>專注於口說與日常應用</p>
         </div>
         
         <button id="modeToggleBtn" class="mode-toggle-btn" onclick="toggleInputMode()">🔄 模式：🗣️ 口說辨識</button>
