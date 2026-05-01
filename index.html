@@ -13,7 +13,7 @@
             --success: #28a745;
             --error: #eb4d4b;
             --warning: #f39c12;
-            --bg: #f8f9fa; /* 更乾淨的高端淺灰底色 */
+            --bg: #f8f9fa; /* 高端淺灰底色 */
             --card: #ffffff;
             --text-main: #1e272e;
             --text-muted: #636e72;
@@ -23,7 +23,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            /* Pretendard 是目前韓國最主流的高質感無襯線字體 */
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background-color: var(--bg); color: var(--text-main);
             margin: 0; padding: 0; 
@@ -81,7 +80,7 @@
         
         /* 測驗模式：中文意思 */
         .meaning-text { 
-            font-size: 24px !important; /* 鎖定大小 */
+            font-size: 24px !important; /* 強制鎖定大字體 */
             font-weight: 800 !important; 
             color: var(--text-main); 
             line-height: 1.4; 
@@ -91,7 +90,7 @@
         
         /* 測驗模式：韓文答案 */
         .correct-answer { 
-            font-size: 30px !important; /* 鎖定大小 */
+            font-size: 30px !important; /* 強制鎖定大字體 */
             font-weight: 800 !important; 
             color: var(--primary); 
             margin-top: 10px; 
@@ -101,7 +100,7 @@
 
         /* 播放按鈕 */
         .play-btn { 
-            font-size: 16px !important; /* 鎖定大小 */
+            font-size: 16px !important; /* 強制鎖定大字體 */
             font-weight: 700 !important;
             background: white; 
             color: var(--primary); 
@@ -132,7 +131,7 @@
         
         /* 情境對話：中文提示 */
         .task-content { 
-            font-size: 24px !important; /* 鎖定大小 */
+            font-size: 24px !important; /* 強制鎖定大字體 */
             font-weight: 800 !important; 
             color: var(--text-main); 
             line-height: 1.4;
@@ -140,7 +139,7 @@
 
         /* 情境對話：韓文解答 */
         .task-korean-hint {
-            font-size: 28px !important; /* 鎖定大小 */
+            font-size: 28px !important; /* 強制鎖定大字體 */
             font-weight: 800 !important;
             color: var(--primary);
             margin-top: 10px;
@@ -200,7 +199,7 @@
     <div class="modal-content">
         <button class="close-modal" onclick="closeGrammarModal()">✕</button>
         <div style="font-size:22px; font-weight:800; color:var(--primary); margin-bottom:15px; border-bottom:2px solid #f1f2f6; padding-bottom:10px;">📖 文法筆記</div>
-        <div id="grammarContent" style="color:var(--text-main); font-size:16px;"></div>
+        <div id="grammarContent" style="color:var(--text-main); font-size:16px; line-height:1.6;"></div>
     </div>
 </div>
 
@@ -214,17 +213,20 @@
         <button id="modeToggleBtn" class="mode-toggle-btn" onclick="toggleInputMode()">🔄 目前模式：🗣️ 語音口說</button>
 
         <div class="menu-grid">
+            <div class="menu-item" style="border-left: 5px solid var(--warning);" onclick="startQuiz('🏠 家居空間 (0430)')">
+                <h3>🏠 家居空間 (0430)</h3><span class="menu-icon">➔</span>
+            </div>
             <div class="menu-item" style="border-left: 5px solid var(--primary);" onclick="showScenarioMenu()">
                 <h3>🎭 情境對話</h3><span class="menu-icon">➔</span>
             </div>
             <div class="menu-item" onclick="startQuiz('詞彙')">
                 <h3>📚 核心詞彙</h3><span class="menu-icon">➔</span>
             </div>
-            <div class="menu-item" onclick="startQuiz('文法')">
-                <h3>⚙️ 語法辨析</h3><span class="menu-icon">➔</span>
-            </div>
             <div class="menu-item" onclick="startQuiz('句型')">
                 <h3>💬 實用長句</h3><span class="menu-icon">➔</span>
+            </div>
+            <div class="menu-item" onclick="startQuiz('全部')">
+                <h3>🎲 全部隨機挑戰</h3><span class="menu-icon">➔</span>
             </div>
             <div class="menu-item" id="mistakeBtn" onclick="startMistakeQuiz()" style="border-left: 5px solid var(--error);">
                 <h3 style="color: var(--error);">🔥 弱點複習 <span id="mistakeCount" class="mistake-badge">0</span></h3><span style="color: var(--error);">➔</span>
@@ -288,6 +290,28 @@
 <script>
     // --- 題庫資料 ---
     const allData = [
+        // --- 0430 筆記單字 ---
+        { cat: "🏠 家居空間 (0430)", ko: "별로", en: "不怎麼... (後接否定)", grammarNote: "<b>별로 + 否定型</b><br>例如：별로 크지 않아요 (不怎麼大)。<br>韓國人表達「不太...」時最常用的說法。" },
+        { cat: "🏠 家居空間 (0430)", ko: "아늑하다", en: "溫馨、舒適、安逸", grammarNote: "形容房間、家裡給人溫暖舒適的感覺。" },
+        { cat: "🏠 家居空間 (0430)", ko: "부엌", en: "廚房", grammarNote: "注意收音 ㅋ 的發音。" },
+        { cat: "🏠 家居空間 (0430)", ko: "거실", en: "客廳" },
+        { cat: "🏠 家居空間 (0430)", ko: "저녁마다", en: "每個晚上", grammarNote: "<b>名詞 + 마다 (每...)</b><br>例如：날마다 (每天)、주말마다 (每個週末)。" },
+        { cat: "🏠 家居空間 (0430)", ko: "다 같이", en: "大家一起" },
+        { cat: "🏠 家居空間 (0430)", ko: "제일", en: "最、第一" },
+        { cat: "🏠 家居空間 (0430)", ko: "넓다", en: "寬敞、廣闊", grammarNote: "注意雙收音 ㄼ 的發音。" },
+        { cat: "🏠 家居空間 (0430)", ko: "가운데", en: "中間" },
+        { cat: "🏠 家居空間 (0430)", ko: "놓여 있어요", en: "被放置著 (狀態)", grammarNote: "形容東西「擺在那邊」的持續狀態。" },
+        { cat: "🏠 家居空間 (0430)", ko: "벽", en: "牆壁" },
+        { cat: "🏠 家居空間 (0430)", ko: "여러 장", en: "很多張" },
+        { cat: "🏠 家居空間 (0430)", ko: "걸려 있어요", en: "掛著 (狀態)" },
+        { cat: "🏠 家居空間 (0430)", ko: "모이다", en: "聚集" },
+        { cat: "🏠 家居空間 (0430)", ko: "바닥", en: "地板" },
+        { cat: "🏠 家居空間 (0430)", ko: "조용히", en: "安靜地 (副詞)" },
+        { cat: "🏠 家居空間 (0430)", ko: "천천히", en: "慢慢地 (副詞)" },
+        { cat: "🏠 家居空間 (0430)", ko: "편하다", en: "舒服、方便", grammarNote: "形容空間讓人放鬆，或事情做起來很方便。" },
+        { cat: "🏠 家居空間 (0430)", ko: "공간", en: "空間" },
+
+        // --- 既有核心單字 ---
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
         { cat: "詞彙", ko: "퇴사", en: "離職 (個人職涯變更)" },
         { cat: "文法", ko: "퇴직할 때", en: "退休的時候", grammarNote: "<b>-(으)ㄹ 때 (表示「當...的時候」)</b><br><br>動詞字幹沒有收音時，接 -ㄹ 때。" },
