@@ -78,9 +78,8 @@
         
         #catTag { font-size: 14px; font-weight: 700; color: var(--primary); letter-spacing: 1px; margin-bottom: 15px; }
         
-        /* 測驗模式：中文意思 */
         .meaning-text { 
-            font-size: 24px !important; /* 強制鎖定大字體 */
+            font-size: 24px !important; 
             font-weight: 800 !important; 
             color: var(--text-main); 
             line-height: 1.4; 
@@ -88,9 +87,8 @@
             letter-spacing: 0.5px;
         }
         
-        /* 測驗模式：韓文答案 */
         .correct-answer { 
-            font-size: 30px !important; /* 強制鎖定大字體 */
+            font-size: 30px !important; 
             font-weight: 800 !important; 
             color: var(--primary); 
             margin-top: 10px; 
@@ -98,9 +96,8 @@
             line-height: 1.3; 
         }
 
-        /* 播放按鈕 */
         .play-btn { 
-            font-size: 16px !important; /* 強制鎖定大字體 */
+            font-size: 16px !important; 
             font-weight: 700 !important;
             background: white; 
             color: var(--primary); 
@@ -115,7 +112,6 @@
         }
         .play-btn:active { transform: scale(0.95); }
 
-        /* 情境對話：高端卡片設計 */
         .task-card { 
             background: var(--card); 
             padding: 20px; 
@@ -129,17 +125,15 @@
         }
         .task-label { font-size: 14px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
         
-        /* 情境對話：中文提示 */
         .task-content { 
-            font-size: 24px !important; /* 強制鎖定大字體 */
+            font-size: 24px !important; 
             font-weight: 800 !important; 
             color: var(--text-main); 
             line-height: 1.4;
         }
 
-        /* 情境對話：韓文解答 */
         .task-korean-hint {
-            font-size: 28px !important; /* 強制鎖定大字體 */
+            font-size: 28px !important; 
             font-weight: 800 !important;
             color: var(--primary);
             margin-top: 10px;
@@ -147,7 +141,6 @@
         }
         /* =================================================================== */
 
-        /* 對話氣泡 */
         .chat-header { text-align: center; font-size: 18px; font-weight: 800; margin-bottom: 15px; color: var(--text-main); }
         .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding: 5px 10px; margin-bottom: 10px; }
         .bubble { max-width: 82%; padding: 14px 18px; border-radius: 20px; font-size: 16px; line-height: 1.5; font-weight: 500; }
@@ -155,7 +148,6 @@
         .bubble.npc .hint { font-size: 13px; color: var(--text-muted); margin-top: 6px; border-top: 1px solid #dfe6e9; padding-top: 6px; }
         .bubble.player { background: var(--chat-user); color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2); }
         
-        /* 文法彈窗按鈕 (優化為精緻的 Badge) */
         .grammar-btn { 
             background: #fff8e1; color: #f39c12; border: none; 
             padding: 6px 14px; border-radius: 12px; font-size: 14px; font-weight: 800; 
@@ -163,16 +155,13 @@
             box-shadow: 0 2px 8px rgba(243, 156, 18, 0.15);
         }
 
-        /* 模態彈窗 (Modal) */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(3px); }
         .modal-content { background: white; padding: 30px 25px; border-radius: 24px; width: 100%; max-width: 400px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.15); line-height: 1.6; }
         .close-modal { position: absolute; top: 15px; right: 15px; background: #f1f2f6; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; color: #666; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        /* 回饋與紅字標記 */
         .feedback-area { min-height: 70px; margin: 5px 0; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1.5; font-size: 16px; }
         .typo-highlight { color: var(--error); background-color: #ffeaea; padding: 0 3px; border-radius: 4px; text-decoration: underline; text-decoration-color: var(--error); text-underline-offset: 3px; font-weight: 800; }
 
-        /* 底部控制區 */
         .controls { padding-bottom: 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
         
         .mic-btn-container { position: relative; display: flex; justify-content: center; height: 90px; margin-bottom: 5px; width: 100%; }
@@ -213,8 +202,8 @@
         <button id="modeToggleBtn" class="mode-toggle-btn" onclick="toggleInputMode()">🔄 目前模式：🗣️ 語音口說</button>
 
         <div class="menu-grid">
-            <div class="menu-item" style="border-left: 5px solid var(--warning);" onclick="startQuiz('🏠 家居空間 (0430)')">
-                <h3>🏠 家居空間 (0430)</h3><span class="menu-icon">➔</span>
+            <div class="menu-item" style="border-left: 5px solid var(--warning);" onclick="startQuiz('🏠 家居空間 (0503)')">
+                <h3>🏠 家居空間 (0503)</h3><span class="menu-icon">➔</span>
             </div>
             <div class="menu-item" style="border-left: 5px solid var(--primary);" onclick="showScenarioMenu()">
                 <h3>🎭 情境對話</h3><span class="menu-icon">➔</span>
@@ -288,28 +277,43 @@
 </div>
 
 <script>
-    // --- 題庫資料 ---
     const allData = [
-        // --- 0430 筆記單字 ---
-        { cat: "🏠 家居空間 (0430)", ko: "별로", en: "不怎麼... (後接否定)", grammarNote: "<b>별로 + 否定型</b><br>例如：별로 크지 않아요 (不怎麼大)。<br>韓國人表達「不太...」時最常用的說法。" },
-        { cat: "🏠 家居空間 (0430)", ko: "아늑하다", en: "溫馨、舒適、安逸", grammarNote: "形容房間、家裡給人溫暖舒適的感覺。" },
-        { cat: "🏠 家居空間 (0430)", ko: "부엌", en: "廚房", grammarNote: "注意收音 ㅋ 的發音。" },
-        { cat: "🏠 家居空間 (0430)", ko: "거실", en: "客廳" },
-        { cat: "🏠 家居空間 (0430)", ko: "저녁마다", en: "每個晚上", grammarNote: "<b>名詞 + 마다 (每...)</b><br>例如：날마다 (每天)、주말마다 (每個週末)。" },
-        { cat: "🏠 家居空間 (0430)", ko: "다 같이", en: "大家一起" },
-        { cat: "🏠 家居空間 (0430)", ko: "제일", en: "最、第一" },
-        { cat: "🏠 家居空間 (0430)", ko: "넓다", en: "寬敞、廣闊", grammarNote: "注意雙收音 ㄼ 的發音。" },
-        { cat: "🏠 家居空間 (0430)", ko: "가운데", en: "中間" },
-        { cat: "🏠 家居空間 (0430)", ko: "놓여 있어요", en: "被放置著 (狀態)", grammarNote: "形容東西「擺在那邊」的持續狀態。" },
-        { cat: "🏠 家居空間 (0430)", ko: "벽", en: "牆壁" },
-        { cat: "🏠 家居空間 (0430)", ko: "여러 장", en: "很多張" },
-        { cat: "🏠 家居空間 (0430)", ko: "걸려 있어요", en: "掛著 (狀態)" },
-        { cat: "🏠 家居空間 (0430)", ko: "모이다", en: "聚集" },
-        { cat: "🏠 家居空間 (0430)", ko: "바닥", en: "地板" },
-        { cat: "🏠 家居空間 (0430)", ko: "조용히", en: "安靜地 (副詞)" },
-        { cat: "🏠 家居空間 (0430)", ko: "천천히", en: "慢慢地 (副詞)" },
-        { cat: "🏠 家居空間 (0430)", ko: "편하다", en: "舒服、方便", grammarNote: "形容空間讓人放鬆，或事情做起來很方便。" },
-        { cat: "🏠 家居空間 (0430)", ko: "공간", en: "空間" },
+        // --- 0503 新增：家居空間單字與文法 ---
+        { cat: "🏠 家居空間 (0503)", ko: "별로", en: "不怎麼... (not really)", grammarNote: "常接否定型使用。<br>例如：별로 크지 않아요 (不怎麼大)。" },
+        { cat: "🏠 家居空間 (0503)", ko: "아늑하다", en: "溫馨", grammarNote: "用來形容房間、家裡給人溫暖舒適的感覺。" },
+        { cat: "🏠 家居空間 (0503)", ko: "부엌", en: "廚房" },
+        { cat: "🏠 家居空間 (0503)", ko: "하나뿐", en: "只有一個 (一個而已)" },
+        { cat: "🏠 家居空間 (0503)", ko: "다 같이", en: "大家一起" },
+        { cat: "🏠 家居空間 (0503)", ko: "가운데", en: "中間" },
+        { cat: "🏠 家居空間 (0503)", ko: "책장", en: "書架" },
+        { cat: "🏠 家居空間 (0503)", ko: "여러 장", en: "很多張" },
+        { cat: "🏠 家居空間 (0503)", ko: "걸려 있어요", en: "掛著 (狀態)" },
+        { cat: "🏠 家居空間 (0503)", ko: "벽", en: "牆壁" },
+        { cat: "🏠 家居空間 (0503)", ko: "모이다", en: "聚集" },
+        { cat: "🏠 家居空間 (0503)", ko: "바닥", en: "地板" },
+        { cat: "🏠 家居空間 (0503)", ko: "조용히", en: "安靜地 (副詞)" },
+        { cat: "🏠 家居空間 (0503)", ko: "천천히", en: "慢慢地 (副詞)" },
+        { cat: "🏠 家居空間 (0503)", ko: "편하다", en: "舒服的" },
+        { cat: "🏠 家居空間 (0503)", ko: "읽으세요", en: "讀 (읽다 的敬語)" },
+        { cat: "🏠 家居空間 (0503)", ko: "세면대", en: "洗手台 (sink)" },
+        { cat: "🏠 家居空間 (0503)", ko: "거울", en: "鏡子 (mirror)" },
+        { cat: "🏠 가居空間 (0503)", ko: "변기", en: "馬桶 (toilet)" },
+        { cat: "🏠 家居空間 (0503)", ko: "욕조", en: "浴缸 (bathtub)" },
+        { cat: "🏠 家居空間 (0503)", ko: "깨끗하다", en: "乾淨 (形容詞)" },
+        { cat: "🏠 家居空間 (0503)", ko: "깨끗이", en: "乾淨地 (副詞)" },
+        { cat: "🏠 家居空間 (0503)", ko: "절로", en: "自然地" },
+        { cat: "🏠 家居空間 (0503)", ko: "닦다", en: "擦拭 / 刷 (例如刷牙)" },
+        { cat: "🏠 家居空間 (0503)", ko: "씻어요", en: "洗 (wash up)" },
+        { cat: "🏠 家居空間 (0503)", ko: "침대", en: "床" },
+        { cat: "🏠 家居空間 (0503)", ko: "옷장", en: "衣櫃" },
+        { cat: "🏠 家居空間 (0503)", ko: "환하다", en: "明亮" },
+        { cat: "🏠 家居空間 (0503)", ko: "하늘색", en: "天藍色 (天色)" },
+        { cat: "🏠 家居空間 (0503)", ko: "숙제", en: "作業 (homework)" },
+        { cat: "🏠 家居空間 (0503)", ko: "신나다", en: "興奮的 / 開心的" },
+        { cat: "🏠 家居空間 (0503)", ko: "놀다", en: "玩" },
+        { cat: "🏠 家居空間 (0503)", ko: "불을 끄다", en: "關燈" },
+        { cat: "文法", ko: "(으)면", en: "如果...的話", grammarNote: "表示假設條件。<br>無收音接 면，有收音接 으면。" },
+        { cat: "文法", ko: "(으)ㄹ 때", en: "當...的時候", grammarNote: "表示動作發生的時間點。<br>無收音接 ㄹ 때，有收音接 을 때。" },
 
         // --- 既有核心單字 ---
         { cat: "詞彙", ko: "퇴직", en: "退休 (官方/合約到期)" },
